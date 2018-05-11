@@ -12,7 +12,7 @@ This is where you craft a short, punchy description of your plugin
 
 == Description ==
 
-This is where you can give a much longer description of your plugin that you can use to explain just how it awesome it really is.
+This is where you can give a much longer description of your plugin that you can use to explain just how awesome it really is.
 
 == Installation ==
 
