@@ -1,0 +1,1059 @@
+/**
+ * AR.Components.css
+ * Styling for AR.Components.js
+ * Clean, minimal design with smooth transitions
+ */
+
+/* ============================================================================
+   RESET & BASE
+   ============================================================================ */
+
+.ar-accordion,
+.ar-modal,
+.ar-drawer,
+.ar-alert,
+.ar-notification,
+.ar-floater,
+.ar-grid {
+    box-sizing: border-box;
+}
+
+.ar-accordion *,
+.ar-modal *
+.ar-drawer *,
+.ar-alert *,
+.ar-notification *,
+.ar-floater *,
+.ar-grid * {
+    box-sizing: inherit;
+}
+
+/* ============================================================================
+   ACCORDION
+   ============================================================================ */
+
+.ar-accordion {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    width: 1000px; /* Previously set to 1000px */
+}
+
+/* Remove default list styling when using ul/ol as accordion */
+ul.ar-accordion,
+ol.ar-accordion {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.ar-accordion > li,
+ol.ar-accordion > li {
+    list-style: none;
+}
+
+/* Accordion items */
+.accordion-item {
+    border-bottom: 1px solid #ddd;
+}
+
+.accordion-item:last-child {
+    border-bottom: none;
+}
+
+/* Accordion header (clickable title) */
+.accordion-header {
+    padding: 0.75rem 1rem;
+    margin: 0;
+    background: #f8f9fa;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s ease;
+    font-weight: 600;
+    font-size: inherit;
+}
+
+.accordion-header:hover {
+    background: #e9ecef;
+}
+
+.accordion-header:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Fixed (always open) sections */
+.accordion-item.accordion-fixed .accordion-header {
+    cursor: default;
+    background: #e9ecef;
+}
+
+.accordion-item.accordion-fixed .accordion-header:hover {
+    background: #e9ecef;
+}
+
+/* Accordion icon - container styling */
+.accordion-icon {
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+/* SVG icons inside accordion - size and opacity */
+.accordion-icon[class*="icon-"]::before {
+    width: 1.25em;
+    height: 1.25em;
+    opacity: 0.7;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Brighten icon when section is open */
+.accordion-item.accordion-open .accordion-icon[class*="icon-"]::before {
+    opacity: 1;
+}
+
+/* Rotation for chevron-right icon when open (90 degrees) */
+.accordion-item.accordion-open .accordion-icon.icon-chevron-right {
+    transform: rotate(90deg);
+}
+
+/* Rotation for chevron-down icon when open (180 degrees / flip) */
+.accordion-item.accordion-open .accordion-icon.icon-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* Accordion content area - collapsed state */
+.accordion-content {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    padding: 0 1rem;
+    margin: 0;
+    background: #fff;
+    /* max-height needs transition, opacity/padding are secondary */
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease; 
+    border-top: 1px solid transparent;
+}
+
+/* Accordion content area - expanded state */
+.accordion-item.accordion-open .accordion-content {
+    opacity: 1;
+    padding: 1rem;
+    border-top-color: #ddd;
+}
+
+/* Text styling inside accordion content */
+.accordion-content p {
+    margin: 0.5rem 0;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* --- ACCORDION LIST FIX: START (Keep CSS structure clean) --- */
+
+/* Target UL/OL directly inside accordion content */
+.accordion-content ul,
+.accordion-content ol {
+    margin: 0.5rem 0;
+    color: #333;
+    line-height: 1.5;
+    
+    /* FIX: Remove default browser padding that throws off scrollHeight */
+    padding-left: 0; 
+    
+    /* FIX: Ensure list markers are inside the line box for better height calc */
+    list-style-position: inside;
+}
+
+/* Add controlled indentation back to list items */
+.accordion-content ul li,
+.accordion-content ol li {
+    padding-left: 1.5rem; /* Indentation for visual hierarchy */
+}
+
+/* Ensure no rogue margins at the edges of the accordion content */
+.accordion-content p:first-child,
+.accordion-content ul:first-child,
+.accordion-content ol:first-child {
+    margin-top: 0;
+}
+
+.accordion-content p:last-child,
+.accordion-content ul:last-child,
+.accordion-content ol:last-child {
+    margin-bottom: 0;
+}
+
+/* --- ACCORDION LIST FIX: END --- */
+
+
+/* ============================================================================
+   MODAL
+   ============================================================================ */
+
+.ar-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+}
+
+.ar-modal-backdrop.show {
+    opacity: 1;
+}
+
+.ar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Container doesn't catch clicks */
+}
+
+.ar-modal.show {
+    opacity: 1;
+}
+
+.modal-dialog {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 900px; /* NEW: Increased from 600px */
+    width: 95%;      /* NEW: Increased from 90% */
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    pointer-events: auto; /* Dialog receives clicks */
+}
+
+.ar-modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+.modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: auto;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    color: #666;
+}
+
+.modal-close:hover {
+    background: #f8f9fa;
+    color: #000;
+}
+
+.modal-close:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    pointer-events: auto;
+}
+
+/* Ensure all modal content is clickable */
+.modal-body * {
+    pointer-events: auto;
+}
+
+/* Ensure cloned forms are visible */
+.modal-body > form {
+    display: block;
+}
+
+/* ============================================================================
+   DRAWER
+   ============================================================================ */
+
+.ar-drawer {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: 33.33%;
+    min-width: 280px;
+    max-width: 400px;
+    background: white;
+    z-index: 1001;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+.ar-drawer.drawer-left {
+    left: 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.ar-drawer.drawer-right {
+    right: 0;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.ar-drawer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ar-drawer li {
+    border-bottom: 1px solid #eee;
+}
+
+.ar-drawer h6 {
+    margin: 0;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    font-weight: 600;
+}
+
+.ar-drawer a {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.ar-drawer a:hover {
+    background: #f5f5f5;
+}
+
+.ar-drawer a:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+.drawer-close {
+    position: sticky;
+    top: 0;
+    display: block;
+    width: 100%;
+    background: white;
+    border: none;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    text-align: right;
+    z-index: 10;
+}
+
+.drawer-close:hover {
+    background: #f5f5f5;
+}
+
+.drawer-close:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+.drawer-hamburger {
+    position: fixed;
+    z-index: 1002;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s ease;
+}
+
+.drawer-hamburger:hover {
+    background: #f5f5f5;
+}
+
+.drawer-hamburger:focus {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+}
+
+.hamburger-left {
+    top: 1rem;
+    left: 1rem;
+}
+
+.hamburger-right {
+    top: 1rem;
+    right: 1rem;
+}
+
+.ar-drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ar-drawer-backdrop.show {
+    opacity: 1;
+}
+
+/* Mobile */
+@media screen and (max-width: 480px) {
+    .ar-drawer {
+        width: 85%;
+        max-width: none;
+    }
+
+    .ar-drawer h6 {
+        padding: 1rem 1.2rem 0.5rem;
+    }
+
+    .ar-drawer a {
+        padding: 1.2rem;
+        font-size: 16px;
+    }
+
+    .drawer-close {
+        padding: 1rem;
+    }
+
+    .drawer-hamburger {
+        padding: 1rem;
+        font-size: 24px;
+    }
+}
+
+/* Phablets */
+@media screen and (min-width: 481px) and (max-width: 767px) {
+    .ar-drawer {
+        width: 60%;
+    }
+
+    .ar-drawer h6 {
+        padding: 0.9rem 1rem 0.4rem;
+    }
+
+    .ar-drawer a {
+        padding: 1rem;
+        font-size: 16px;
+    }
+
+    .drawer-close {
+        padding: 0.9rem;
+    }
+
+    .drawer-hamburger {
+        padding: 0.9rem;
+        font-size: 22px;
+    }
+}
+
+/* Tablets */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .ar-drawer h6 {
+        padding: 0.8rem 0.9rem 0.4rem;
+    }
+
+    .ar-drawer a {
+        padding: 0.9rem;
+        font-size: 15px;
+    }
+
+    .drawer-close {
+        padding: 0.8rem;
+    }
+
+    .drawer-hamburger {
+        padding: 0.8rem;
+        font-size: 20px;
+    }
+}
+
+/* Desktop */
+@media screen and (min-width: 1025px) {
+    .ar-drawer h6 {
+        padding: 0.75rem 1rem 0.5rem;
+    }
+
+    .ar-drawer a {
+        padding: 0.75rem 1rem;
+        font-size: 15px;
+    }
+
+    .drawer-close {
+        padding: 0.75rem 1rem;
+    }
+
+    .drawer-hamburger {
+        padding: 0.75rem;
+        font-size: 20px;
+    }
+}
+
+/* ============================================================================
+   ALERT
+   ============================================================================ */
+
+.ar-alert {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.ar-alert.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 1rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.alert-close:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* Alert Types */
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-success .alert-close:hover {
+    background: #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-error .alert-close:hover {
+    background: #f5c6cb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.alert-warning .alert-close:hover {
+    background: #ffeeba;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-info .alert-close:hover {
+    background: #bee5eb;
+}
+
+/* ============================================================================
+   NOTIFICATION (Toast)
+   ============================================================================ */
+
+.ar-notification-container {
+    position: fixed;
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.ar-notification-container.top-right {
+    top: 1rem;
+    right: 1rem;
+}
+
+.ar-notification-container.top-left {
+    top: 1rem;
+    left: 1rem;
+}
+
+.ar-notification-container.bottom-right {
+    bottom: 1rem;
+    right: 1rem;
+}
+
+.ar-notification-container.bottom-left {
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.ar-notification {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 0.5rem;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    min-width: 250px;
+}
+
+.ar-notification-container.top-left .ar-notification,
+.ar-notification-container.bottom-left .ar-notification {
+    transform: translateX(-100%);
+}
+
+.ar-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Notification Types */
+.notification-success {
+    border-left: 4px solid #28a745;
+    color: #155724;
+}
+
+.notification-error {
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+}
+
+.notification-warning {
+    border-left: 4px solid #ffc107;
+    color: #856404;
+}
+
+.notification-info {
+    border-left: 4px solid #17a2b8;
+    color: #0c5460;
+}
+
+/* ============================================================================
+   GRID
+   ============================================================================ */
+
+.ar-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+/* 12-column grid system */
+.grid-col-1 { grid-column: span 1; }
+.grid-col-2 { grid-column: span 2; }
+.grid-col-3 { grid-column: span 3; }
+.grid-col-4 { grid-column: span 4; }
+.grid-col-5 { grid-column: span 5; }
+.grid-col-6 { grid-column: span 6; }
+.grid-col-7 { grid-column: span 7; }
+.grid-col-8 { grid-column: span 8; }
+.grid-col-9 { grid-column: span 9; }
+.grid-col-10 { grid-column: span 10; }
+.grid-col-11 { grid-column: span 11; }
+.grid-col-12 { grid-column: span 12; }
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+    .grid-col-md-1 { grid-column: span 1; }
+    .grid-col-md-2 { grid-column: span 2; }
+    .grid-col-md-3 { grid-column: span 3; }
+    .grid-col-md-4 { grid-column: span 4; }
+    .grid-col-md-5 { grid-column: span 5; }
+    .grid-col-md-6 { grid-column: span 6; }
+    .grid-col-md-7 { grid-column: span 7; }
+    .grid-col-md-8 { grid-column: span 8; }
+    .grid-col-md-9 { grid-column: span 9; }
+    .grid-col-md-10 { grid-column: span 10; }
+    .grid-col-md-11 { grid-column: span 11; }
+    .grid-col-md-12 { grid-column: span 12; }
+}
+
+@media (max-width: 480px) {
+    .grid-col-sm-1 { grid-column: span 1; }
+    .grid-col-sm-2 { grid-column: span 2; }
+    .grid-col-sm-3 { grid-column: span 3; }
+    .grid-col-sm-4 { grid-column: span 4; }
+    .grid-col-sm-5 { grid-column: span 5; }
+    .grid-col-sm-6 { grid-column: span 6; }
+    .grid-col-sm-7 { grid-column: span 7; }
+    .grid-col-sm-8 { grid-column: span 8; }
+    .grid-col-sm-9 { grid-column: span 9; }
+    .grid-col-sm-10 { grid-column: span 10; }
+    .grid-col-sm-11 { grid-column: span 11; }
+    .grid-col-sm-12 { grid-column: span 12; }
+}
+
+/* ============================================================================
+   FLOATER
+   ============================================================================ */
+
+.ar-floater {
+    position: fixed;
+    background: #fffacd; /* Sticky note yellow */
+    border: 1px solid #e6d48a;
+    border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 2px rgba(0, 0, 0, 0.1);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.2s ease;
+    min-width: 200px;
+    max-width: 90vw;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.ar-floater.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ar-floater.dragging {
+    cursor: move;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 4px rgba(0, 0, 0, 0.15);
+    user-select: none;
+}
+
+/* Floater header */
+.floater-header {
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(to bottom, #fff9b3, #fffacd);
+    border-bottom: 1px solid #e6d48a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 2px 2px 0 0;
+    user-select: none;
+}
+
+.floater-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #333;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.floater-controls {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.floater-minimize,
+.floater-close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: background 0.2s ease;
+    color: #666;
+    font-weight: bold;
+}
+
+.floater-minimize:hover,
+.floater-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #000;
+}
+
+.floater-minimize:focus,
+.floater-close:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Floater body */
+.floater-body {
+    padding: 0.75rem;
+    overflow: auto;
+    flex: 1;
+    color: #333;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    background: #fffacd;
+}
+
+/* Minimized state */
+.ar-floater.minimized {
+    height: auto !important;
+}
+
+.ar-floater.minimized .floater-body {
+    display: none;
+}
+
+/* Add some styling for content inside floaters */
+.floater-body p {
+    margin: 0.5rem 0;
+}
+
+.floater-body p:first-child {
+    margin-top: 0;
+}
+
+.floater-body p:last-child {
+    margin-bottom: 0;
+}
+
+.floater-body ul,
+.floater-body ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.floater-body ul:first-child,
+.floater-body ol:first-child {
+    margin-top: 0;
+}
+
+.floater-body ul:last-child,
+.floater-body ol:last-child {
+    margin-bottom: 0;
+}
+
+/* Color variants for different floater styles */
+.ar-floater.floater-blue {
+    background: #cce5ff;
+    border-color: #99ccff;
+}
+
+.ar-floater.floater-blue .floater-header {
+    background: linear-gradient(to bottom, #e6f2ff, #cce5ff);
+    border-bottom-color: #99ccff;
+}
+
+.ar-floater.floater-blue .floater-body {
+    background: #cce5ff;
+}
+
+.ar-floater.floater-green {
+    background: #d4f4dd;
+    border-color: #a9e8be;
+}
+
+.ar-floater.floater-green .floater-header {
+    background: linear-gradient(to bottom, #e6f9ec, #d4f4dd);
+    border-bottom-color: #a9e8be;
+}
+
+.ar-floater.floater-green .floater-body {
+    background: #d4f4dd;
+}
+
+.ar-floater.floater-pink {
+    background: #ffe6f0;
+    border-color: #ffcce0;
+}
+
+.ar-floater.floater-pink .floater-header {
+    background: linear-gradient(to bottom, #fff0f7, #ffe6f0);
+    border-bottom-color: #ffcce0;
+}
+
+.ar-floater.floater-pink .floater-body {
+    background: #ffe6f0;
+}
+
+/* ============================================================================
+   PROGRESS BAR
+   ============================================================================ */
+
+.ar-progress {
+    width: 100%;
+    height: 24px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #007bff;
+    transition: width 0.3s ease, background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-width: 0;
+}
+
+.progress-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Progress variants */
+.progress-default {
+    background: #007bff;
+}
+
+.progress-success {
+    background: #28a745;
+}
+
+.progress-warning {
+    background: #ffc107;
+}
+
+.progress-danger {
+    background: #dc3545;
+}
+
+/* Striped pattern */
+.progress-striped {
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 1rem 1rem;
+}
+
+/* Animated stripes */
+.progress-animated {
+    animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 1rem 0;
+    }
+}
+
+/* ============================================================================
+   UTILITIES
+   ============================================================================ */
+
+.ar-fade-in {
+    animation: arFadeIn 0.3s ease;
+}
+
+.ar-fade-out {
+    animation: arFadeOut 0.3s ease;
+}
+
+@keyframes arFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes arFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Forces an element to take full width and handle padding correctly */
+.ar-full-width {
+    width: 100%;
+    display: block;
+    box-sizing: border-box; /* Ensures padding doesn't overflow width */
+    margin-bottom: 1rem;    /* Adds spacing below the element */
+}
+
+/* Optional: styling specifically for inputs using this class to make them look better */
+input.ar-full-width,
+select.ar-full-width,
+textarea.ar-full-width {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button.ar-full-width {
+    padding: 0.5rem;
+    cursor: pointer;
+}

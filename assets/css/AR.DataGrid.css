@@ -1,0 +1,598 @@
+/**
+ * AR.DataGrid.css
+ * Styling for AR.DataGrid.js
+ * Clean, minimal design consistent with AR.Components
+ * 
+ * Color palette harmonized with AR.Components.css:
+ * - Primary: #007bff
+ * - Success: #28a745, #d4edda, #155724
+ * - Warning: #ffc107, #fff3cd, #856404
+ * - Error: #dc3545, #f8d7da, #721c24
+ * - Info: #17a2b8, #d1ecf1, #0c5460
+ * - Backgrounds: #fff, #f8f9fa, #e9ecef
+ * - Borders: #ddd, #eee, #ccc
+ * - Text: #333, #666, #999
+ */
+
+/* ============================================================================
+   BASE TABLE STYLING
+   ============================================================================ */
+
+.ar-datagrid {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 14px;
+    table-layout: auto;
+}
+
+/* ============================================================================
+   HEADER STYLING
+   ============================================================================ */
+
+.ar-datagrid thead {
+    background: #f8f9fa;
+    border-bottom: 2px solid #ddd;
+}
+
+.ar-datagrid thead th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* ============================================================================
+   BODY / ROW STYLING
+   ============================================================================ */
+
+.ar-datagrid tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.15s ease;
+}
+
+.ar-datagrid tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Alternating row colors (subtle) */
+.ar-datagrid tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.ar-datagrid tbody tr:nth-child(odd) {
+    background: #fff;
+}
+
+/* Row hover - using info light for consistency */
+.ar-datagrid tbody tr:hover,
+.ar-datagrid tbody tr.datagrid-row-hover {
+    background: #d1ecf1;
+}
+
+/* ============================================================================
+   CELL STYLING
+   ============================================================================ */
+
+.ar-datagrid tbody td {
+    padding: 0.6rem 1rem;
+    color: #333;
+    vertical-align: middle;
+}
+
+/* Empty cells */
+.ar-datagrid .datagrid-cell-empty {
+    color: #999;
+    font-style: italic;
+}
+
+.ar-datagrid .datagrid-cell-empty::before {
+    content: "—";
+}
+
+/* ============================================================================
+   PROBLEM CELLS (for missing group-by/sort-by data)
+   ============================================================================ */
+
+.ar-datagrid .datagrid-cell-warning {
+    background: #fff3cd;
+}
+
+.ar-datagrid .datagrid-cell-error {
+    background: #f8d7da;
+}
+
+/* ============================================================================
+   GROUP ROW STYLING
+   ============================================================================ */
+
+.ar-datagrid .datagrid-group-row {
+    background: #e9ecef;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ar-datagrid .datagrid-group-row:hover {
+    background: #dee2e6;
+}
+
+.ar-datagrid .datagrid-group-row td {
+    padding: 0.5rem 1rem;
+}
+
+.ar-datagrid .datagrid-group-icon {
+    display: inline-block;
+    width: 1.25em;
+    margin-right: 0.5rem;
+    text-align: center;
+}
+
+.ar-datagrid .datagrid-group-label {
+    font-weight: 600;
+}
+
+.ar-datagrid .datagrid-group-count {
+    color: #666;
+    font-weight: normal;
+    margin-left: 0.5rem;
+}
+
+/* Problem bucket styling - using warning palette */
+.ar-datagrid .datagrid-group-row.datagrid-problem-group {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.ar-datagrid .datagrid-group-row.datagrid-problem-group:hover {
+    background: #ffeeba;
+}
+
+/* ============================================================================
+   SORTABLE HEADER STYLING
+   ============================================================================ */
+
+.ar-datagrid thead th.datagrid-sortable {
+    cursor: pointer;
+}
+
+.ar-datagrid thead th.datagrid-sortable:hover {
+    background: #e9ecef;
+}
+
+.ar-datagrid thead th .datagrid-sort-icon {
+    display: inline-block;
+    margin-left: 0.5rem;
+    opacity: 0.5;
+}
+
+.ar-datagrid thead th.datagrid-sort-asc .datagrid-sort-icon,
+.ar-datagrid thead th.datagrid-sort-desc .datagrid-sort-icon {
+    opacity: 1;
+}
+
+/* ============================================================================
+   "SHOW MORE" LINK STYLING
+   ============================================================================ */
+
+.ar-datagrid .datagrid-show-more {
+    text-align: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.ar-datagrid .datagrid-show-more a {
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ar-datagrid .datagrid-show-more a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   INDICATOR COLUMN
+   ============================================================================ */
+
+.ar-datagrid .datagrid-indicator-header {
+    width: 2rem;
+    min-width: 2rem;
+    max-width: 2rem;
+    padding: 0.5rem !important;
+    text-align: center;
+}
+
+.ar-datagrid .datagrid-indicator-cell {
+    width: 2rem;
+    min-width: 2rem;
+    max-width: 2rem;
+    padding: 0.5rem !important;
+    text-align: center;
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* Current row highlight - using info palette */
+.ar-datagrid tbody tr.datagrid-row-current {
+    background: #d1ecf1 !important;
+    border-left: 3px solid #17a2b8;
+}
+
+.ar-datagrid tbody tr.datagrid-row-current:hover {
+    background: #bee5eb !important;
+}
+
+/* ============================================================================
+   FOOTER / NAVIGATION CONTROLS
+   ============================================================================ */
+
+.ar-datagrid tfoot {
+    background: #f8f9fa;
+    border-top: 2px solid #ddd;
+}
+
+.ar-datagrid .datagrid-footer {
+    padding: 0.5rem 1rem;
+}
+
+.ar-datagrid .datagrid-nav-container {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.ar-datagrid .datagrid-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #333;
+    font-size: 1rem;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ar-datagrid .datagrid-nav-btn:hover:not(:disabled) {
+    background: #e9ecef;
+    border-color: #ccc;
+}
+
+.ar-datagrid .datagrid-nav-btn:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.ar-datagrid .datagrid-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ar-datagrid .datagrid-nav-btn span[class^="icon-"] {
+    font-size: 0.875rem;
+}
+
+/* First/Last buttons have double chevrons */
+.ar-datagrid .datagrid-nav-first span:last-child,
+.ar-datagrid .datagrid-nav-last span:last-child {
+    margin-left: -6px;
+}
+
+/* Row indicator text */
+.ar-datagrid .datagrid-row-indicator {
+    margin: 0 1rem;
+    font-size: 0.875rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* Refresh button */
+.ar-datagrid .datagrid-nav-refresh {
+    margin-left: 0.5rem;
+}
+
+/* Load more link */
+.ar-datagrid .datagrid-load-more {
+    margin-left: auto;
+}
+
+.ar-datagrid .datagrid-load-more a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.ar-datagrid .datagrid-load-more a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   GROUPING
+   ============================================================================ */
+
+.datagrid-group-row {
+    background: linear-gradient(to bottom, #e9ecef, #dee2e6);
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.datagrid-group-row:hover {
+    background: linear-gradient(to bottom, #dee2e6, #ced4da);
+}
+
+.datagrid-group-row:hover .datagrid-group-toggle {
+    border-color: #333;
+    background: #f8f9fa;
+}
+
+.datagrid-group-row:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+.datagrid-group-cell {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #ccc;
+}
+
+.datagrid-group-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+    padding: 0;
+    border: 1px solid #666;
+    border-radius: 3px;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1;
+    vertical-align: middle;
+    color: #333;
+}
+
+.datagrid-group-label {
+    color: #333;
+}
+
+/* Problem bucket styling - using warning palette */
+.datagrid-group-row.datagrid-group-problem {
+    background: linear-gradient(to bottom, #fff3cd, #ffeeba);
+}
+
+.datagrid-group-row.datagrid-group-problem:hover {
+    background: linear-gradient(to bottom, #ffeeba, #ffe69c);
+}
+
+.datagrid-group-row.datagrid-group-problem .datagrid-group-label {
+    color: #856404;
+}
+
+/* Warning/error cells for rows in problem bucket */
+.datagrid-cell-warning {
+    background: #fff3cd !important;
+}
+
+.datagrid-cell-error {
+    background: #f8d7da !important;
+}
+
+/* ============================================================================
+   HEADER SORTING
+   ============================================================================ */
+
+.ar-datagrid thead th.datagrid-sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 3rem;  /* Space for both pin and sort icons */
+    transition: background 0.15s ease;
+}
+
+.ar-datagrid thead th.datagrid-sortable:hover {
+    background: #e9ecef;
+}
+
+.ar-datagrid thead th.datagrid-sortable:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+/* Sort icon container */
+.datagrid-sort-icon {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3;
+    transition: opacity 0.15s ease;
+}
+
+.ar-datagrid thead th.datagrid-sortable:hover .datagrid-sort-icon {
+    opacity: 0.6;
+}
+
+/* Active sort indicator */
+.datagrid-sort-icon.icon-chevron-up,
+.datagrid-sort-icon.icon-chevron-down {
+    opacity: 1;
+}
+
+/* Pin icon (for grouping - on all columns) */
+.datagrid-pin-icon {
+    position: absolute;
+    right: 1.75rem;  /* Leave room for sort icon on the right */
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.25;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    cursor: pointer;
+    padding: 0.15rem;
+    border-radius: 3px;
+}
+
+.ar-datagrid thead th.datagrid-sortable:hover .datagrid-pin-icon {
+    opacity: 0.5;
+}
+
+.datagrid-pin-icon:hover {
+    opacity: 0.8 !important;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.datagrid-pin-icon:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 1px;
+    opacity: 1;
+}
+
+/* Active pin (currently grouped by this column) */
+.datagrid-pin-icon.datagrid-pin-active {
+    opacity: 1;
+    color: #007bff;
+}
+
+.datagrid-pin-icon.datagrid-pin-active:hover {
+    opacity: 1 !important;
+}
+
+/* Highlight group-by column header - using info light */
+.ar-datagrid thead th.datagrid-group-by-header {
+    background: #d1ecf1;
+}
+
+.ar-datagrid thead th.datagrid-group-by-header:hover {
+    background: #bee5eb;
+}
+
+/* Sort icon styling using AR.Icons */
+.datagrid-sort-icon.icon-chevron-up::before,
+.datagrid-sort-icon.icon-chevron-down::before {
+    width: 0.75em;
+    height: 0.75em;
+}
+
+/* ============================================================================
+   SCROLLABLE CONTAINER (for wide tables)
+   ============================================================================ */
+
+.ar-datagrid-container {
+    overflow-x: auto;
+    max-width: 100%;
+    position: relative;
+}
+
+/* Edge scroll indicators - using primary blue */
+.ar-datagrid-container::before,
+.ar-datagrid-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+.ar-datagrid-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 123, 255, 0.15), transparent);
+}
+
+.ar-datagrid-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 123, 255, 0.15), transparent);
+}
+
+/* Show indicators when scrollable */
+.ar-datagrid-container.can-scroll-left::before {
+    opacity: 1;
+}
+
+.ar-datagrid-container.can-scroll-right::after {
+    opacity: 1;
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media screen and (max-width: 768px) {
+    .ar-datagrid {
+        font-size: 13px;
+    }
+    
+    .ar-datagrid thead th,
+    .ar-datagrid tbody td {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .ar-datagrid {
+        font-size: 12px;
+    }
+    
+    .ar-datagrid thead th,
+    .ar-datagrid tbody td {
+        padding: 0.4rem 0.5rem;
+    }
+}
+
+/* ============================================================================
+   ACCESSIBILITY - FOCUS STATES
+   ============================================================================ */
+
+.ar-datagrid:focus-within {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.ar-datagrid tbody tr:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.ar-datagrid.datagrid-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.ar-datagrid.datagrid-loading tbody::after {
+    content: "Loading...";
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+/* ============================================================================
+   EMPTY STATE
+   ============================================================================ */
+
+.ar-datagrid tbody:empty::after {
+    content: "No data to display";
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+    font-style: italic;
+}

@@ -1,0 +1,414 @@
+/* AR.Charts.css
+   Styling for AR.Charts.js
+*/
+
+/* Chart container */
+.ar-chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+/* Canvas element */
+.ar-chart-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Loading state */
+.ar-chart-container.chart-loading::after {
+    content: 'Loading chart data...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    font-size: 14px;
+}
+
+/* Empty state */
+.ar-chart-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+
+.ar-chart-empty-icon {
+    font-size: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Chart controls */
+.ar-chart-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.ar-chart-controls button {
+    padding: 0.5rem 1rem;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s ease;
+}
+
+.ar-chart-controls button:hover {
+    background: #0056b3;
+}
+
+.ar-chart-controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.ar-chart-controls button.active {
+    background: #28a745;
+}
+
+/* Chart type selector */
+.ar-chart-type-selector {
+    display: inline-flex;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.ar-chart-type-selector button {
+    border-radius: 0;
+    border-right: 1px solid #ddd;
+    margin: 0;
+}
+
+.ar-chart-type-selector button:last-child {
+    border-right: none;
+}
+
+/* View toggle (Chart/Grid) */
+.ar-view-toggle {
+    display: inline-flex;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.ar-view-toggle button {
+    background: transparent;
+    color: #333;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ar-view-toggle button:hover {
+    background: #e9ecef;
+}
+
+.ar-view-toggle button.active {
+    background: #007bff;
+    color: #fff;
+}
+
+/* ============================================================
+   FILTER PANEL - UPDATED WITH OVERFLOW FIX
+   ============================================================ */
+
+/* Filter Panel (Floater) - NEW: Flexbox layout with max-height */
+.ar-chart-filter-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    min-width: 200px;
+    max-width: 280px;
+    max-height: calc(100vh - 40px); /* ✅ Prevent overflow beyond viewport */
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    font-size: 13px;
+}
+
+/* Header - stays fixed at top */
+.ar-chart-filter-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: #333;
+    border-radius: 6px 6px 0 0;
+    flex-shrink: 0; /* ✅ Don't let header shrink */
+}
+
+/* ✅ NEW: Scrollable content wrapper */
+.ar-chart-filter-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Series header - sticky within scrollable area */
+.ar-chart-filter-series-header {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* Filter items - no individual max-height anymore */
+.ar-chart-filter-items {
+    padding: 8px 0;
+}
+
+.ar-chart-filter-item {
+    padding: 0;
+    margin: 0;
+}
+
+.ar-chart-filter-label {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    gap: 8px;
+}
+
+.ar-chart-filter-label:hover {
+    background: #f8f9fa;
+}
+
+.ar-chart-filter-label input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.ar-chart-filter-color {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.ar-chart-filter-text {
+    flex: 1;
+    color: #333;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+/* Crossed out label when unchecked */
+.ar-chart-filter-text.ar-chart-filter-crossed {
+    text-decoration: line-through;
+    color: #999;
+    opacity: 0.6;
+}
+
+/* Date Filter Section */
+.ar-chart-filter-date-section {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ar-chart-filter-date-group {
+    margin-bottom: 8px;
+}
+
+.ar-chart-filter-date-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.ar-chart-filter-date-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.ar-chart-filter-date-input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.ar-chart-filter-date-reset {
+    width: 100%;
+    padding: 6px 8px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.ar-chart-filter-date-reset:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+/* Numeric Range Filter Section */
+.ar-chart-filter-numeric-section {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ar-chart-filter-numeric-range {
+    margin-bottom: 12px;
+}
+
+.ar-chart-filter-numeric-range:last-child {
+    margin-bottom: 0;
+}
+
+.ar-chart-filter-numeric-header {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-transform: capitalize;
+}
+
+.ar-chart-filter-numeric-group {
+    margin-bottom: 8px;
+}
+
+.ar-chart-filter-numeric-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.ar-chart-filter-numeric-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.ar-chart-filter-numeric-input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Categorical Filter Section */
+.ar-chart-filter-categorical-section {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ar-chart-filter-categorical-items {
+    padding: 4px 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Scrollbar styling for main content area */
+.ar-chart-filter-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ar-chart-filter-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.ar-chart-filter-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.ar-chart-filter-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Scrollbar for categorical items */
+.ar-chart-filter-categorical-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ar-chart-filter-categorical-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.ar-chart-filter-categorical-items::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.ar-chart-filter-categorical-items::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ar-chart-container {
+        min-height: 300px;
+    }
+
+    .ar-chart-controls {
+        justify-content: center;
+    }
+
+    .ar-chart-filter-panel {
+        top: 5px;
+        right: 5px;
+        min-width: 160px;
+        max-width: 220px;
+        font-size: 12px;
+        max-height: calc(100vh - 20px); /* Adjusted for mobile */
+    }
+
+    .ar-chart-filter-header {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .ar-chart-filter-label {
+        padding: 6px 10px;
+    }
+}

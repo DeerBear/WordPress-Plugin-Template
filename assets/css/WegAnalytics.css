@@ -1,0 +1,37 @@
+/**
+ * WegAnalytics.css
+ * Site-specific styles for WegAnalytics
+ */
+
+/* ============================================================================
+   HEADER / TITLE
+   ============================================================================ */
+
+h1 a:hover {
+    text-decoration: none;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+#footer a {
+    text-decoration: none;
+}
+
+/* Link states */
+#footer a:link {
+    color: white;
+}
+
+#footer a:visited {
+    color: white;
+}
+
+#footer a:hover {
+    color: salmon;
+}
+
+#footer a:active {
+    color: blue;
+}

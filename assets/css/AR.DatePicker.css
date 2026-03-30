@@ -1,0 +1,502 @@
+/**
+ * AR.DatePicker.css
+ * Styling for DatePicker and RangePicker components
+ * Accessible, clean design with high-contrast selection
+ * 
+ * Color palette harmonized with AR.Components.css:
+ * - Primary: #007bff
+ * - Success: #28a745, #d4edda, #c3e6cb, #155724
+ * - Warning: #ffc107, #fff3cd, #856404
+ * - Error: #dc3545, #f8d7da, #721c24
+ * - Info: #17a2b8, #d1ecf1, #bee5eb, #0c5460
+ * - Backgrounds: #fff, #f8f9fa, #e9ecef
+ * - Borders: #ddd, #eee, #ccc
+ * - Text: #333, #666, #999
+ */
+
+/* ============================================================================
+   SHARED BASE STYLES
+   ============================================================================ */
+
+.ar-datepicker-wrapper,
+.ar-rangepicker-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.ar-datepicker-popup,
+.ar-rangepicker-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.ar-datepicker-popup.open,
+.ar-rangepicker-popup.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(4px);
+}
+
+/* ============================================================================
+   DATE PICKER SPECIFIC
+   ============================================================================ */
+
+.ar-datepicker-wrapper {
+    display: inline-flex;
+    align-items: stretch;
+}
+
+.ar-datepicker-wrapper input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    font-size: 1rem;
+    min-width: 140px;
+}
+
+.ar-datepicker-wrapper input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.ar-datepicker-trigger {
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.ar-datepicker-trigger:hover {
+    background: #e9ecef;
+}
+
+.ar-datepicker-trigger:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+.ar-datepicker-popup {
+    padding: 0.75rem;
+    min-width: 280px;
+}
+
+/* ============================================================================
+   CALENDAR HEADER & NAVIGATION
+   ============================================================================ */
+
+.ar-datepicker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+}
+
+.ar-datepicker-nav {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.ar-datepicker-nav:hover {
+    background: #e9ecef;
+    border-color: #ddd;
+}
+
+.ar-datepicker-nav:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.ar-datepicker-nav-spacer {
+    width: 32px;
+}
+
+.ar-datepicker-selectors {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.ar-datepicker-month,
+.ar-datepicker-year {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ar-datepicker-month:focus,
+.ar-datepicker-year:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.ar-datepicker-month {
+    min-width: 110px;
+}
+
+.ar-datepicker-year {
+    min-width: 80px;
+}
+
+/* ============================================================================
+   CALENDAR GRID
+   ============================================================================ */
+
+.ar-datepicker-grid {
+    user-select: none;
+}
+
+.ar-datepicker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 0.25rem;
+}
+
+.ar-datepicker-day-header {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #666;
+    padding: 0.25rem;
+    text-transform: uppercase;
+}
+
+.ar-datepicker-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+/* ============================================================================
+   DATE CELLS
+   ============================================================================ */
+
+.ar-datepicker-date {
+    aspect-ratio: 1;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ar-datepicker-date:hover:not(.disabled):not(.selected) {
+    background: #e9ecef;
+    border-color: #ddd;
+}
+
+.ar-datepicker-date:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+    z-index: 1;
+}
+
+.ar-datepicker-date.other-month {
+    color: #999;
+}
+
+.ar-datepicker-date.other-month:hover:not(.disabled) {
+    color: #666;
+}
+
+/* Today - using primary blue border */
+.ar-datepicker-date.today {
+    border-color: #007bff;
+    font-weight: 600;
+}
+
+.ar-datepicker-date.disabled {
+    color: #999;
+    cursor: not-allowed;
+    background: #f8f9fa;
+}
+
+/* ============================================================================
+   SELECTED STATES - HIGH CONTRAST GREEN (Success palette)
+   ============================================================================ */
+
+.ar-datepicker-date.selected {
+    background: #28a745;
+    color: #fff;
+    border-color: #28a745;
+    font-weight: 600;
+}
+
+.ar-datepicker-date.selected:hover {
+    background: #218838;
+    border-color: #1e7e34;
+}
+
+.ar-datepicker-date.selected.today {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px #28a745;
+}
+
+/* Range selection specific - using success palette */
+.ar-datepicker-date.range-start {
+    background: #28a745;
+    color: #fff;
+    border-radius: 4px 0 0 4px;
+}
+
+.ar-datepicker-date.range-end {
+    background: #28a745;
+    color: #fff;
+    border-radius: 0 4px 4px 0;
+}
+
+.ar-datepicker-date.range-start.range-end {
+    border-radius: 4px;
+}
+
+.ar-datepicker-date.in-range:not(.range-start):not(.range-end) {
+    background: #d4edda;
+    color: #155724;
+    border-radius: 0;
+}
+
+.ar-datepicker-date.in-range:hover:not(.range-start):not(.range-end) {
+    background: #c3e6cb;
+}
+
+/* ============================================================================
+   RANGE PICKER SPECIFIC
+   ============================================================================ */
+
+.ar-rangepicker-display {
+    padding: 0.5rem 1rem;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 250px;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ar-rangepicker-display:hover {
+    border-color: #999;
+}
+
+.ar-rangepicker-display:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.ar-rangepicker-popup {
+    padding: 0;
+    min-width: auto;
+}
+
+.ar-rangepicker-content {
+    display: flex;
+}
+
+/* ============================================================================
+   PRESETS SIDEBAR
+   ============================================================================ */
+
+.ar-rangepicker-presets {
+    background: #f8f9fa;
+    border-right: 1px solid #ddd;
+    padding: 0.75rem;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ar-rangepicker-presets-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.ar-rangepicker-preset {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ar-rangepicker-preset:hover {
+    background: #e9ecef;
+    border-color: #ddd;
+}
+
+.ar-rangepicker-preset:focus {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+/* Active preset - using success green for consistency with date selection */
+.ar-rangepicker-preset.active {
+    background: #28a745;
+    color: #fff;
+    border-color: #28a745;
+}
+
+/* ============================================================================
+   CALENDARS CONTAINER
+   ============================================================================ */
+
+.ar-rangepicker-calendars {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem;
+}
+
+.ar-rangepicker-calendar {
+    min-width: 280px;
+}
+
+.ar-rangepicker-calendar-left {
+    border-right: 1px solid #eee;
+    padding-right: 1rem;
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media screen and (max-width: 700px) {
+    .ar-rangepicker-content {
+        flex-direction: column;
+    }
+    
+    .ar-rangepicker-presets {
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        flex-direction: row;
+        flex-wrap: wrap;
+        min-width: auto;
+    }
+    
+    .ar-rangepicker-presets-label {
+        width: 100%;
+    }
+    
+    .ar-rangepicker-calendars {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .ar-rangepicker-calendar-left {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding-right: 0;
+        padding-bottom: 0.75rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .ar-datepicker-popup,
+    .ar-rangepicker-calendar {
+        min-width: 260px;
+    }
+    
+    .ar-datepicker-date {
+        min-width: 28px;
+        min-height: 28px;
+        font-size: 0.85rem;
+    }
+    
+    .ar-datepicker-month {
+        min-width: 90px;
+        font-size: 0.85rem;
+    }
+    
+    .ar-datepicker-year {
+        min-width: 70px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ============================================================================
+   HIGH CONTRAST MODE SUPPORT
+   ============================================================================ */
+
+@media (prefers-contrast: high) {
+    .ar-datepicker-date.selected,
+    .ar-datepicker-date.range-start,
+    .ar-datepicker-date.range-end {
+        background: #000;
+        color: #fff;
+        border: 2px solid #000;
+    }
+    
+    .ar-datepicker-date.in-range:not(.range-start):not(.range-end) {
+        background: #ccc;
+        color: #000;
+        border: 1px solid #000;
+    }
+    
+    .ar-datepicker-date.today {
+        border: 2px solid #000;
+    }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .ar-datepicker-popup,
+    .ar-rangepicker-popup {
+        transition: none;
+    }
+    
+    .ar-datepicker-date,
+    .ar-datepicker-nav,
+    .ar-rangepicker-preset,
+    .ar-rangepicker-display,
+    .ar-datepicker-trigger {
+        transition: none;
+    }
+}
