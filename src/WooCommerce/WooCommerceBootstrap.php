@@ -42,28 +42,27 @@ class WooCommerceBootstrap {
 
 		$this->wc_active = true;
 
-		// Always register these regardless of license (needed for HPOS compat).
+		// Always register HPOS compat regardless of license/mode.
 		add_action( 'before_woocommerce_init', [ $this, 'declare_hpos_compatibility' ] );
 
-		// Check license before loading premium WC features.
-		$gate = $this->get_feature_gate();
+		// Check if WC features require a license (depends on Config::MODE).
+		if ( Config::wc_features_require_license() ) {
+			$gate = $this->get_feature_gate();
 
-		if ( ! $gate->is_valid() ) {
-			add_action( 'admin_notices', [ $this, 'license_inactive_notice' ] );
-			// Still load basic settings so the user can configure/activate.
-			add_filter( 'woocommerce_get_settings_pages', [ $this, 'add_settings_tab' ] );
-			return;
+			if ( ! $gate->is_valid() ) {
+				add_action( 'admin_notices', [ $this, 'license_inactive_notice' ] );
+				add_filter( 'woocommerce_get_settings_pages', [ $this, 'add_settings_tab' ] );
+				return;
+			}
+
+			if ( ! $this->is_wc_feature_allowed( $gate ) ) {
+				add_action( 'admin_notices', [ $this, 'wc_feature_not_included_notice' ] );
+				add_filter( 'woocommerce_get_settings_pages', [ $this, 'add_settings_tab' ] );
+				return;
+			}
 		}
 
-		// Gate WC features behind license — check for 'woocommerce' feature
-		// or require a minimum tier. Customise this logic for your needs.
-		if ( ! $this->is_wc_feature_allowed( $gate ) ) {
-			add_action( 'admin_notices', [ $this, 'wc_feature_not_included_notice' ] );
-			add_filter( 'woocommerce_get_settings_pages', [ $this, 'add_settings_tab' ] );
-			return;
-		}
-
-		// Full WC integration — license is valid and includes WC features.
+		// Load all WC features (either freely or license check already passed).
 		add_filter( 'woocommerce_get_settings_pages', [ $this, 'add_settings_tab' ] );
 		add_action( 'woocommerce_loaded', [ $this, 'load_product_types' ] );
 		add_filter( 'woocommerce_payment_gateways', [ $this, 'register_payment_gateways' ] );
@@ -74,8 +73,6 @@ class WooCommerceBootstrap {
 
 		/**
 		 * Fires after the plugin's WooCommerce integrations are loaded.
-		 *
-		 * Only fires when the license is valid and WC features are allowed.
 		 */
 		do_action( Config::PREFIX . 'woocommerce_loaded' );
 	}

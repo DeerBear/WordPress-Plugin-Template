@@ -2,6 +2,9 @@
 /**
  * Main plugin class.
  *
+ * Respects Config::MODE to determine which features load freely
+ * and which require a license. See Config.php for mode definitions.
+ *
  * @package YourPlugin
  */
 
@@ -47,9 +50,9 @@ final class Plugin {
 	private function __construct() {
 		$this->load_textdomain();
 		$this->init_license();
-		$this->init_admin();
-		$this->init_update_checker();
+		$this->init_wp_features();
 		$this->init_woocommerce();
+		$this->init_update_checker();
 		$this->register_hooks();
 	}
 
@@ -71,32 +74,83 @@ final class Plugin {
 
 	/**
 	 * Initialise the license client and feature gate.
+	 *
+	 * Always loads — every mode needs licensing (either to gate WP or WC features,
+	 * or for update checks). In 'wp_only' mode it still powers self-hosted updates.
 	 */
 	private function init_license(): void {
 		$this->license_client = new LicenseClient(
-			/**
-			 * Filters the license API base URL.
-			 *
-			 * @param string $api_url The base URL of your license server API.
-			 */
 			apply_filters( Config::PREFIX . 'license_api_url', Config::LICENSE_API_URL )
 		);
 
 		$this->feature_gate = new FeatureGate( $this->license_client );
+
+		// License admin page always available so users can activate.
+		if ( is_admin() ) {
+			new LicenseAdmin( $this->license_client );
+		}
 	}
 
 	/**
-	 * Initialise admin components.
+	 * Initialise general WP features (settings page, CPTs, taxonomies, admin API).
+	 *
+	 * Behaviour per mode:
+	 *   wp_only        — loads freely
+	 *   wc_only        — skipped entirely
+	 *   wp_licensed_wc — loads freely
+	 *   wc_licensed_wp — loads only with a valid license
 	 */
-	private function init_admin(): void {
-		if ( ! is_admin() ) {
+	private function init_wp_features(): void {
+		if ( ! Config::wp_features_enabled() ) {
 			return;
 		}
 
-		$this->admin_api = new AdminAPI();
-		$this->settings  = new Settings( $this->admin_api );
+		// If WP features require a license, check before loading.
+		if ( Config::wp_features_require_license() ) {
+			if ( ! $this->feature_gate->is_valid() ) {
+				if ( is_admin() ) {
+					add_action( 'admin_notices', [ $this, 'wp_features_license_notice' ] );
+				}
+				return;
+			}
 
-		new LicenseAdmin( $this->license_client );
+			// Optionally gate behind a specific feature or tier.
+			$allowed = apply_filters(
+				Config::PREFIX . 'wp_features_allowed',
+				$this->feature_gate->can( 'wp_features' ) || $this->feature_gate->tier_at_least( 'pro' ),
+				$this->feature_gate
+			);
+
+			if ( ! $allowed ) {
+				if ( is_admin() ) {
+					add_action( 'admin_notices', [ $this, 'wp_features_tier_notice' ] );
+				}
+				return;
+			}
+		}
+
+		// Load WP features.
+		if ( is_admin() ) {
+			$this->admin_api = new AdminAPI();
+			$this->settings  = new Settings( $this->admin_api );
+		}
+	}
+
+	/**
+	 * Initialise WooCommerce integration.
+	 *
+	 * Behaviour per mode:
+	 *   wp_only        — skipped entirely
+	 *   wc_only        — loads freely (no license required for WC)
+	 *   wp_licensed_wc — loads, but WC features gated behind license
+	 *   wc_licensed_wp — loads freely (no license required for WC)
+	 */
+	private function init_woocommerce(): void {
+		if ( ! Config::wc_features_enabled() ) {
+			return;
+		}
+
+		$this->woocommerce = new WooCommerceBootstrap();
 	}
 
 	/**
@@ -105,21 +159,9 @@ final class Plugin {
 	private function init_update_checker(): void {
 		$this->update_checker = new UpdateChecker(
 			YOUR_PLUGIN_FILE,
-			/**
-			 * Filters the update server URL.
-			 *
-			 * @param string $update_url The URL of your update server endpoint.
-			 */
 			apply_filters( Config::PREFIX . 'update_url', Config::UPDATE_URL ),
 			$this->license_client
 		);
-	}
-
-	/**
-	 * Initialise WooCommerce integration (loads only if WC is active).
-	 */
-	private function init_woocommerce(): void {
-		$this->woocommerce = new WooCommerceBootstrap();
 	}
 
 	/**
@@ -129,6 +171,44 @@ final class Plugin {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_assets' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 	}
+
+	// -- Admin notices for licensed WP features ------------------------------
+
+	/**
+	 * Notice: WP features require an active license.
+	 */
+	public function wp_features_license_notice(): void {
+		printf(
+			'<div class="notice notice-warning"><p>%s <a href="%s">%s</a></p></div>',
+			esc_html(
+				sprintf(
+					/* translators: %s: plugin name */
+					__( '%s features are disabled — no active license found.', Config::TEXT_DOMAIN ),
+					Config::NAME
+				)
+			),
+			esc_url( admin_url( 'options-general.php?page=' . Config::SLUG . '-license' ) ),
+			esc_html__( 'Activate your license', Config::TEXT_DOMAIN )
+		);
+	}
+
+	/**
+	 * Notice: WP features require a higher license tier.
+	 */
+	public function wp_features_tier_notice(): void {
+		printf(
+			'<div class="notice notice-info"><p>%s</p></div>',
+			esc_html(
+				sprintf(
+					/* translators: %s: plugin name */
+					__( '%s features require a Pro license or higher. Please upgrade to unlock.', Config::TEXT_DOMAIN ),
+					Config::NAME
+				)
+			)
+		);
+	}
+
+	// -- Assets --------------------------------------------------------------
 
 	/**
 	 * Enqueue frontend assets.
@@ -172,6 +252,8 @@ final class Plugin {
 		// );
 	}
 
+	// -- Activation / Deactivation -------------------------------------------
+
 	/**
 	 * Plugin activation.
 	 */
@@ -202,7 +284,6 @@ final class Plugin {
 	 * Plugin deactivation.
 	 */
 	public static function deactivate(): void {
-		// Deactivate the license on the remote server.
 		$license_key = get_option( Config::OPTION_LICENSE_KEY, '' );
 		if ( ! empty( $license_key ) ) {
 			$client = new LicenseClient(

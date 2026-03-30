@@ -47,6 +47,23 @@ final class Config {
 	/** Author name. */
 	public const AUTHOR = 'Your Name';
 
+	// -- Deployment mode -----------------------------------------------------
+
+	/**
+	 * Controls which parts of the plugin load freely vs require a license.
+	 *
+	 * Modes:
+	 *   'wp_only'         — General WP plugin only, no WooCommerce at all.
+	 *   'wc_only'         — WooCommerce-focused, minimal WP shell (no general
+	 *                       settings/CPTs/taxonomies), no license required for WC.
+	 *   'wp_licensed_wc'  — General WP features load freely, WooCommerce
+	 *                       features require a valid license (Pro+ tier).
+	 *   'wc_licensed_wp'  — WooCommerce features load freely, general WP
+	 *                       features (settings, CPTs, taxonomies) require a
+	 *                       valid license.
+	 */
+	public const MODE = 'wp_licensed_wc';
+
 	// -- Licensing -----------------------------------------------------------
 
 	/** Base URL of your license server API. */
@@ -83,6 +100,28 @@ final class Config {
 	// -- Nonce actions -------------------------------------------------------
 
 	public const NONCE_LICENSE = self::PREFIX . 'license_action';
+
+	// -- Mode helpers --------------------------------------------------------
+
+	/** Whether general WP features (settings, CPTs, taxonomies) should load. */
+	public static function wp_features_enabled(): bool {
+		return self::MODE !== 'wc_only';
+	}
+
+	/** Whether WooCommerce integration should load. */
+	public static function wc_features_enabled(): bool {
+		return self::MODE !== 'wp_only';
+	}
+
+	/** Whether general WP features require a license. */
+	public static function wp_features_require_license(): bool {
+		return self::MODE === 'wc_licensed_wp';
+	}
+
+	/** Whether WooCommerce features require a license. */
+	public static function wc_features_require_license(): bool {
+		return self::MODE === 'wp_licensed_wc';
+	}
 
 	/**
 	 * Generate a meta box nonce key.
