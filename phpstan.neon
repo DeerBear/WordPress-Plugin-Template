@@ -1,0 +1,9 @@
+parameters:
+  level: 6
+  paths:
+    - src
+  ignoreErrors:
+    # WordPress functions not known to PHPStan without stubs.
+    - '#Function [a-z_]+ not found\.#'
+  bootstrapFiles:
+    - vendor/autoload.php

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<ruleset name="YourPlugin">
+	<description>Coding standards for Your Plugin.</description>
+
+	<!-- Scan these files -->
+	<file>src</file>
+	<file>your-plugin.php</file>
+
+	<!-- Exclude vendor -->
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<exclude-pattern>tests/*</exclude-pattern>
+	<exclude-pattern>assets/*</exclude-pattern>
+
+	<!-- WordPress coding standards -->
+	<rule ref="WordPress">
+		<!-- Allow PSR-4 file naming -->
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+		<!-- Allow short array syntax -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found"/>
+	</rule>
+
+	<!-- PHP compatibility -->
+	<config name="testVersion" value="8.1-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- Text domain -->
+	<config name="text_domain" value="your-plugin"/>
+
+	<!-- Minimum WP version -->
+	<config name="minimum_wp_version" value="6.0"/>
+</ruleset>
