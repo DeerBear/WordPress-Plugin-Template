@@ -115,7 +115,7 @@ class UpdateChecker {
 		}
 
 		return (object) [
-			'name'          => $remote['name'] ?? 'Your Plugin',
+			'name'          => $remote['name'] ?? Config::NAME,
 			'slug'          => $this->plugin_slug,
 			'version'       => $remote['version'],
 			'author'        => $remote['author'] ?? '',
