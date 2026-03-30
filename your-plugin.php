@@ -14,6 +14,10 @@
  * Domain Path:       /lang
  * Update URI:        https://your-update-server.com/api/plugins/your-plugin
  *
+ * NOTE: The header above is parsed by WordPress and CANNOT use PHP constants.
+ * Keep it in sync with src/Config.php — that file is the single source of truth
+ * for all runtime references.
+ *
  * @package YourPlugin
  */
 
@@ -23,8 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Plugin constants.
-define( 'YOUR_PLUGIN_VERSION', '1.0.0' );
+// Plugin path constants (these are file-level and must stay here).
 define( 'YOUR_PLUGIN_FILE', __FILE__ );
 define( 'YOUR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'YOUR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -34,6 +37,9 @@ define( 'YOUR_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 if ( file_exists( YOUR_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once YOUR_PLUGIN_DIR . 'vendor/autoload.php';
 }
+
+// Version constant derived from Config (single source of truth).
+define( 'YOUR_PLUGIN_VERSION', \YourPlugin\Config::VERSION );
 
 /**
  * Returns the main plugin instance.

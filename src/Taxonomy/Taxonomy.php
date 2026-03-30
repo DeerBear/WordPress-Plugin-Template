@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace YourPlugin\Taxonomy;
 
+use YourPlugin\Config;
+
 /**
  * Registers a custom taxonomy with sensible defaults.
  *
@@ -53,23 +55,23 @@ class Taxonomy {
 		$labels = [
 			'name'                       => $this->plural,
 			'singular_name'              => $this->single,
-			'search_items'               => sprintf( __( 'Search %s', 'your-plugin' ), $this->plural ),
-			'popular_items'              => sprintf( __( 'Popular %s', 'your-plugin' ), $this->plural ),
-			'all_items'                  => sprintf( __( 'All %s', 'your-plugin' ), $this->plural ),
-			'parent_item'                => sprintf( __( 'Parent %s', 'your-plugin' ), $this->single ),
-			'parent_item_colon'          => sprintf( __( 'Parent %s:', 'your-plugin' ), $this->single ),
-			'edit_item'                  => sprintf( __( 'Edit %s', 'your-plugin' ), $this->single ),
-			'update_item'                => sprintf( __( 'Update %s', 'your-plugin' ), $this->single ),
-			'add_new_item'               => sprintf( __( 'Add New %s', 'your-plugin' ), $this->single ),
-			'new_item_name'              => sprintf( __( 'New %s Name', 'your-plugin' ), $this->single ),
-			'separate_items_with_commas' => sprintf( __( 'Separate %s with commas', 'your-plugin' ), strtolower( $this->plural ) ),
-			'add_or_remove_items'        => sprintf( __( 'Add or remove %s', 'your-plugin' ), strtolower( $this->plural ) ),
-			'choose_from_most_used'      => sprintf( __( 'Choose from the most used %s', 'your-plugin' ), strtolower( $this->plural ) ),
-			'not_found'                  => sprintf( __( 'No %s found.', 'your-plugin' ), strtolower( $this->plural ) ),
+			'search_items'               => sprintf( __( 'Search %s', Config::TEXT_DOMAIN ), $this->plural ),
+			'popular_items'              => sprintf( __( 'Popular %s', Config::TEXT_DOMAIN ), $this->plural ),
+			'all_items'                  => sprintf( __( 'All %s', Config::TEXT_DOMAIN ), $this->plural ),
+			'parent_item'                => sprintf( __( 'Parent %s', Config::TEXT_DOMAIN ), $this->single ),
+			'parent_item_colon'          => sprintf( __( 'Parent %s:', Config::TEXT_DOMAIN ), $this->single ),
+			'edit_item'                  => sprintf( __( 'Edit %s', Config::TEXT_DOMAIN ), $this->single ),
+			'update_item'                => sprintf( __( 'Update %s', Config::TEXT_DOMAIN ), $this->single ),
+			'add_new_item'               => sprintf( __( 'Add New %s', Config::TEXT_DOMAIN ), $this->single ),
+			'new_item_name'              => sprintf( __( 'New %s Name', Config::TEXT_DOMAIN ), $this->single ),
+			'separate_items_with_commas' => sprintf( __( 'Separate %s with commas', Config::TEXT_DOMAIN ), strtolower( $this->plural ) ),
+			'add_or_remove_items'        => sprintf( __( 'Add or remove %s', Config::TEXT_DOMAIN ), strtolower( $this->plural ) ),
+			'choose_from_most_used'      => sprintf( __( 'Choose from the most used %s', Config::TEXT_DOMAIN ), strtolower( $this->plural ) ),
+			'not_found'                  => sprintf( __( 'No %s found.', Config::TEXT_DOMAIN ), strtolower( $this->plural ) ),
 			'menu_name'                  => $this->plural,
-			'items_list_navigation'      => sprintf( __( '%s list navigation', 'your-plugin' ), $this->plural ),
-			'items_list'                 => sprintf( __( '%s list', 'your-plugin' ), $this->plural ),
-			'back_to_items'              => sprintf( __( '&larr; Back to %s', 'your-plugin' ), $this->plural ),
+			'items_list_navigation'      => sprintf( __( '%s list navigation', Config::TEXT_DOMAIN ), $this->plural ),
+			'items_list'                 => sprintf( __( '%s list', Config::TEXT_DOMAIN ), $this->plural ),
+			'back_to_items'              => sprintf( __( '&larr; Back to %s', Config::TEXT_DOMAIN ), $this->plural ),
 		];
 
 		$defaults = [
@@ -91,7 +93,7 @@ class Taxonomy {
 		 * @param array  $args     Registration arguments.
 		 * @param string $taxonomy Taxonomy key.
 		 */
-		$args = apply_filters( "your_plugin_{$this->taxonomy}_register_args", $args, $this->taxonomy );
+		$args = apply_filters( Config::PREFIX . "{$this->taxonomy}_register_args", $args, $this->taxonomy );
 
 		register_taxonomy( $this->taxonomy, $this->post_types, $args );
 	}

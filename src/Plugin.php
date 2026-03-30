@@ -60,7 +60,7 @@ final class Plugin {
 	 */
 	private function load_textdomain(): void {
 		load_plugin_textdomain(
-			'your-plugin',
+			Config::TEXT_DOMAIN,
 			false,
 			dirname( YOUR_PLUGIN_BASENAME ) . '/lang'
 		);
@@ -76,7 +76,7 @@ final class Plugin {
 			 *
 			 * @param string $api_url The base URL of your license server API.
 			 */
-			apply_filters( 'your_plugin_license_api_url', 'https://your-license-server.com/api' )
+			apply_filters( Config::PREFIX . 'license_api_url', Config::LICENSE_API_URL )
 		);
 
 		$this->feature_gate = new FeatureGate( $this->license_client );
@@ -107,7 +107,7 @@ final class Plugin {
 			 *
 			 * @param string $update_url The URL of your update server endpoint.
 			 */
-			apply_filters( 'your_plugin_update_url', 'https://your-update-server.com/api/plugins/your-plugin' ),
+			apply_filters( Config::PREFIX . 'update_url', Config::UPDATE_URL ),
 			$this->license_client
 		);
 	}
@@ -125,18 +125,18 @@ final class Plugin {
 	 */
 	public function enqueue_frontend_assets(): void {
 		wp_enqueue_style(
-			'your-plugin-frontend',
+			Config::SLUG . '-frontend',
 			YOUR_PLUGIN_URL . 'assets/css/frontend.css',
 			[],
-			YOUR_PLUGIN_VERSION
+			Config::VERSION
 		);
 
 		// Enqueue your own JS library here:
 		// wp_enqueue_script(
-		//     'your-plugin-frontend',
+		//     Config::SLUG . '-frontend',
 		//     YOUR_PLUGIN_URL . 'assets/js/your-library.js',
 		//     [],
-		//     YOUR_PLUGIN_VERSION,
+		//     Config::VERSION,
 		//     true
 		// );
 	}
@@ -146,18 +146,18 @@ final class Plugin {
 	 */
 	public function enqueue_admin_assets(): void {
 		wp_enqueue_style(
-			'your-plugin-admin',
+			Config::SLUG . '-admin',
 			YOUR_PLUGIN_URL . 'assets/css/admin.css',
 			[],
-			YOUR_PLUGIN_VERSION
+			Config::VERSION
 		);
 
 		// Enqueue your own JS library for admin here:
 		// wp_enqueue_script(
-		//     'your-plugin-admin',
+		//     Config::SLUG . '-admin',
 		//     YOUR_PLUGIN_URL . 'assets/js/your-library.js',
 		//     [],
-		//     YOUR_PLUGIN_VERSION,
+		//     Config::VERSION,
 		//     true
 		// );
 	}
@@ -166,20 +166,24 @@ final class Plugin {
 	 * Plugin activation.
 	 */
 	public static function activate(): void {
-		if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+		if ( version_compare( PHP_VERSION, Config::REQUIRES_PHP, '<' ) ) {
 			deactivate_plugins( YOUR_PLUGIN_BASENAME );
 			wp_die(
-				esc_html__( 'This plugin requires PHP 8.1 or higher.', 'your-plugin' ),
+				sprintf(
+					/* translators: %s: Required PHP version. */
+					esc_html__( 'This plugin requires PHP %s or higher.', Config::TEXT_DOMAIN ),
+					Config::REQUIRES_PHP
+				),
 				'Plugin Activation Error',
 				[ 'back_link' => true ]
 			);
 		}
 
 		// Set default options.
-		add_option( 'your_plugin_version', YOUR_PLUGIN_VERSION );
-		add_option( 'your_plugin_license_key', '' );
-		add_option( 'your_plugin_license_status', '' );
-		add_option( 'your_plugin_license_data', [] );
+		add_option( Config::OPTION_VERSION, Config::VERSION );
+		add_option( Config::OPTION_LICENSE_KEY, '' );
+		add_option( Config::OPTION_LICENSE_STATUS, '' );
+		add_option( Config::OPTION_LICENSE_DATA, [] );
 
 		flush_rewrite_rules();
 	}
@@ -189,10 +193,10 @@ final class Plugin {
 	 */
 	public static function deactivate(): void {
 		// Deactivate the license on the remote server.
-		$license_key = get_option( 'your_plugin_license_key', '' );
+		$license_key = get_option( Config::OPTION_LICENSE_KEY, '' );
 		if ( ! empty( $license_key ) ) {
 			$client = new LicenseClient(
-				apply_filters( 'your_plugin_license_api_url', 'https://your-license-server.com/api' )
+				apply_filters( Config::PREFIX . 'license_api_url', Config::LICENSE_API_URL )
 			);
 			$client->deactivate( $license_key );
 		}

@@ -13,21 +13,28 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
+// Load autoloader for Config access.
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
+
+use YourPlugin\Config;
+
 // Remove plugin options.
-delete_option( 'your_plugin_version' );
-delete_option( 'your_plugin_options' );
-delete_option( 'your_plugin_license_key' );
-delete_option( 'your_plugin_license_status' );
-delete_option( 'your_plugin_license_data' );
+delete_option( Config::OPTION_VERSION );
+delete_option( Config::OPTION_SETTINGS );
+delete_option( Config::OPTION_LICENSE_KEY );
+delete_option( Config::OPTION_LICENSE_STATUS );
+delete_option( Config::OPTION_LICENSE_DATA );
 
 // Remove transients.
-delete_transient( 'your_plugin_license_cache' );
-delete_transient( 'your_plugin_update_info' );
+delete_transient( Config::TRANSIENT_LICENSE_CACHE );
+delete_transient( Config::TRANSIENT_UPDATE_INFO );
 
 // Remove scheduled events.
-$timestamp = wp_next_scheduled( 'your_plugin_license_check' );
+$timestamp = wp_next_scheduled( Config::CRON_LICENSE_CHECK );
 if ( $timestamp ) {
-	wp_unschedule_event( $timestamp, 'your_plugin_license_check' );
+	wp_unschedule_event( $timestamp, Config::CRON_LICENSE_CHECK );
 }
 
 // Uncomment to remove custom post types and their content:

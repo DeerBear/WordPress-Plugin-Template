@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace YourPlugin\Update;
 
+use YourPlugin\Config;
 use YourPlugin\License\LicenseClient;
 
 /**
@@ -67,7 +68,7 @@ class UpdateChecker {
 			return $transient;
 		}
 
-		$current_version = $transient->checked[ $this->plugin_basename ] ?? YOUR_PLUGIN_VERSION;
+		$current_version = $transient->checked[ $this->plugin_basename ] ?? Config::VERSION;
 
 		if ( version_compare( $remote['version'], $current_version, '>' ) ) {
 			$transient->response[ $this->plugin_basename ] = (object) [
@@ -163,7 +164,7 @@ class UpdateChecker {
 	 * @return array|null Update data or null on failure.
 	 */
 	private function fetch_update_info(): ?array {
-		$cache_key = 'your_plugin_update_info';
+		$cache_key = Config::TRANSIENT_UPDATE_INFO;
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
@@ -173,7 +174,7 @@ class UpdateChecker {
 		$url = add_query_arg( [
 			'license_key'    => $this->license_client->get_key(),
 			'site_url'       => home_url(),
-			'plugin_version' => YOUR_PLUGIN_VERSION,
+			'plugin_version' => Config::VERSION,
 		], $this->update_url );
 
 		$response = wp_remote_get( $url, [

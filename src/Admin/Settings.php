@@ -9,14 +9,12 @@ declare(strict_types=1);
 
 namespace YourPlugin\Admin;
 
+use YourPlugin\Config;
+
 /**
  * Registers and renders a tabbed settings page under Settings > Your Plugin.
  */
 class Settings {
-
-	private const SLUG = 'your-plugin-settings';
-	private const OPTION_GROUP = 'your_plugin_settings';
-	private const OPTION_NAME  = 'your_plugin_options';
 
 	private AdminAPI $admin_api;
 
@@ -36,57 +34,57 @@ class Settings {
 	/**
 	 * Define settings tabs and their fields.
 	 *
-	 * Override or extend via the 'your_plugin_settings_tabs' filter.
+	 * Override or extend via the '{prefix}settings_tabs' filter.
 	 */
 	private function init_tabs(): void {
 		$this->tabs = [
 			'general' => [
-				'title'  => __( 'General', 'your-plugin' ),
+				'title'  => __( 'General', Config::TEXT_DOMAIN ),
 				'fields' => [
 					[
 						'id'          => 'example_text',
 						'type'        => 'text',
-						'label'       => __( 'Example Text', 'your-plugin' ),
-						'description' => __( 'An example text setting.', 'your-plugin' ),
+						'label'       => __( 'Example Text', Config::TEXT_DOMAIN ),
+						'description' => __( 'An example text setting.', Config::TEXT_DOMAIN ),
 						'default'     => '',
-						'placeholder' => __( 'Enter something…', 'your-plugin' ),
+						'placeholder' => __( 'Enter something…', Config::TEXT_DOMAIN ),
 					],
 					[
 						'id'          => 'example_select',
 						'type'        => 'select',
-						'label'       => __( 'Example Select', 'your-plugin' ),
-						'description' => __( 'Choose an option.', 'your-plugin' ),
+						'label'       => __( 'Example Select', Config::TEXT_DOMAIN ),
+						'description' => __( 'Choose an option.', Config::TEXT_DOMAIN ),
 						'default'     => 'option_1',
 						'options'     => [
-							'option_1' => __( 'Option 1', 'your-plugin' ),
-							'option_2' => __( 'Option 2', 'your-plugin' ),
-							'option_3' => __( 'Option 3', 'your-plugin' ),
+							'option_1' => __( 'Option 1', Config::TEXT_DOMAIN ),
+							'option_2' => __( 'Option 2', Config::TEXT_DOMAIN ),
+							'option_3' => __( 'Option 3', Config::TEXT_DOMAIN ),
 						],
 					],
 					[
 						'id'          => 'example_checkbox',
 						'type'        => 'checkbox',
-						'label'       => __( 'Enable Feature', 'your-plugin' ),
-						'description' => __( 'Check to enable this feature.', 'your-plugin' ),
+						'label'       => __( 'Enable Feature', Config::TEXT_DOMAIN ),
+						'description' => __( 'Check to enable this feature.', Config::TEXT_DOMAIN ),
 						'default'     => '',
 					],
 				],
 			],
 			'advanced' => [
-				'title'  => __( 'Advanced', 'your-plugin' ),
+				'title'  => __( 'Advanced', Config::TEXT_DOMAIN ),
 				'fields' => [
 					[
 						'id'          => 'example_number',
 						'type'        => 'number',
-						'label'       => __( 'Cache Duration', 'your-plugin' ),
-						'description' => __( 'Cache duration in seconds.', 'your-plugin' ),
+						'label'       => __( 'Cache Duration', Config::TEXT_DOMAIN ),
+						'description' => __( 'Cache duration in seconds.', Config::TEXT_DOMAIN ),
 						'default'     => '3600',
 					],
 					[
 						'id'          => 'example_textarea',
 						'type'        => 'textarea',
-						'label'       => __( 'Custom Code', 'your-plugin' ),
-						'description' => __( 'Custom code snippet.', 'your-plugin' ),
+						'label'       => __( 'Custom Code', Config::TEXT_DOMAIN ),
+						'description' => __( 'Custom code snippet.', Config::TEXT_DOMAIN ),
 						'default'     => '',
 					],
 				],
@@ -98,7 +96,7 @@ class Settings {
 		 *
 		 * @param array $tabs Settings tabs configuration.
 		 */
-		$this->tabs = apply_filters( 'your_plugin_settings_tabs', $this->tabs );
+		$this->tabs = apply_filters( Config::PREFIX . 'settings_tabs', $this->tabs );
 	}
 
 	/**
@@ -106,10 +104,11 @@ class Settings {
 	 */
 	public function add_menu_page(): void {
 		add_options_page(
-			__( 'Your Plugin Settings', 'your-plugin' ),
-			__( 'Your Plugin', 'your-plugin' ),
+			/* translators: %s: plugin name */
+			sprintf( __( '%s Settings', Config::TEXT_DOMAIN ), Config::NAME ),
+			Config::NAME,
 			'manage_options',
-			self::SLUG,
+			Config::SLUG . '-settings',
 			[ $this, 'render_page' ]
 		);
 	}
@@ -119,19 +118,20 @@ class Settings {
 	 */
 	public function register_settings(): void {
 		register_setting(
-			self::OPTION_GROUP,
-			self::OPTION_NAME,
+			Config::PREFIX . 'settings',
+			Config::OPTION_SETTINGS,
 			[ 'sanitize_callback' => [ $this, 'sanitize_options' ] ]
 		);
 
 		foreach ( $this->tabs as $tab_id => $tab ) {
-			$section_id = "your_plugin_section_{$tab_id}";
+			$section_id = Config::PREFIX . 'section_' . $tab_id;
+			$page_slug  = Config::SLUG . '-settings_' . $tab_id;
 
 			add_settings_section(
 				$section_id,
 				'',
 				'__return_false',
-				self::SLUG . '_' . $tab_id
+				$page_slug
 			);
 
 			foreach ( $tab['fields'] as $field ) {
@@ -139,11 +139,11 @@ class Settings {
 					$field['id'],
 					$field['label'] ?? '',
 					function () use ( $field ): void {
-						$options = get_option( self::OPTION_NAME, [] );
+						$options = get_option( Config::OPTION_SETTINGS, [] );
 						$value   = $options[ $field['id'] ] ?? ( $field['default'] ?? '' );
-						$this->admin_api->render_field( $field, $value, self::OPTION_NAME );
+						$this->admin_api->render_field( $field, $value, Config::OPTION_SETTINGS );
 					},
-					self::SLUG . '_' . $tab_id,
+					$page_slug,
 					$section_id
 				);
 			}
@@ -184,8 +184,8 @@ class Settings {
 	public function add_settings_link( array $links ): array {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'options-general.php?page=' . self::SLUG ) ),
-			esc_html__( 'Settings', 'your-plugin' )
+			esc_url( admin_url( 'options-general.php?page=' . Config::SLUG . '-settings' ) ),
+			esc_html__( 'Settings', Config::TEXT_DOMAIN )
 		);
 
 		array_unshift( $links, $settings_link );
@@ -207,6 +207,8 @@ class Settings {
 			$current_tab = array_key_first( $this->tabs );
 		}
 
+		$slug = Config::SLUG . '-settings';
+
 		echo '<div class="wrap">';
 		printf( '<h1>%s</h1>', esc_html( get_admin_page_title() ) );
 
@@ -216,7 +218,7 @@ class Settings {
 			$active = ( $tab_id === $current_tab ) ? ' nav-tab-active' : '';
 			printf(
 				'<a href="%s" class="nav-tab%s">%s</a>',
-				esc_url( add_query_arg( 'tab', $tab_id, admin_url( 'options-general.php?page=' . self::SLUG ) ) ),
+				esc_url( add_query_arg( 'tab', $tab_id, admin_url( 'options-general.php?page=' . $slug ) ) ),
 				esc_attr( $active ),
 				esc_html( $tab['title'] )
 			);
@@ -225,8 +227,8 @@ class Settings {
 
 		// Render form.
 		echo '<form method="post" action="options.php">';
-		settings_fields( self::OPTION_GROUP );
-		do_settings_sections( self::SLUG . '_' . $current_tab );
+		settings_fields( Config::PREFIX . 'settings' );
+		do_settings_sections( $slug . '_' . $current_tab );
 		submit_button();
 		echo '</form>';
 

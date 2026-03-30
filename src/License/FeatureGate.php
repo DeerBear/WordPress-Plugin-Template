@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace YourPlugin\License;
 
+use YourPlugin\Config;
+
 /**
  * Provides helpers to gate features behind license tiers.
  *
@@ -44,7 +46,7 @@ class FeatureGate {
 		 *
 		 * @param string[] $tiers Ordered tier names.
 		 */
-		$this->tier_hierarchy = apply_filters( 'your_plugin_tier_hierarchy', [
+		$this->tier_hierarchy = apply_filters( Config::PREFIX . 'tier_hierarchy', [
 			'free',
 			'starter',
 			'pro',
@@ -126,7 +128,7 @@ class FeatureGate {
 			 * @param bool   $allowed Whether to allow the feature without a license.
 			 * @param string $feature The feature being checked.
 			 */
-			return apply_filters( 'your_plugin_unlicensed_feature', false, $feature );
+			return apply_filters( Config::PREFIX . 'unlicensed_feature', false, $feature );
 		}
 
 		$data     = $this->client->get_data();

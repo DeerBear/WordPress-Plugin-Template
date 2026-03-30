@@ -21,26 +21,24 @@ declare(strict_types=1);
 
 namespace YourPlugin\License;
 
+use YourPlugin\Config;
+
 /**
  * Handles license activation, deactivation, validation, and status caching.
  */
 class LicenseClient {
 
-	private const OPTION_KEY        = 'your_plugin_license_key';
-	private const STATUS_OPTION     = 'your_plugin_license_status';
-	private const DATA_OPTION       = 'your_plugin_license_data';
-	private const CACHE_TRANSIENT   = 'your_plugin_license_cache';
-	private const CACHE_TTL         = 12 * HOUR_IN_SECONDS;
+	private const CACHE_TTL = 12 * HOUR_IN_SECONDS;
 
 	private string $api_url;
 
 	public function __construct( string $api_url ) {
 		$this->api_url = rtrim( $api_url, '/' );
 
-		add_action( 'your_plugin_license_check', [ $this, 'scheduled_check' ] );
+		add_action( Config::CRON_LICENSE_CHECK, [ $this, 'scheduled_check' ] );
 
-		if ( ! wp_next_scheduled( 'your_plugin_license_check' ) ) {
-			wp_schedule_event( time(), 'twicedaily', 'your_plugin_license_check' );
+		if ( ! wp_next_scheduled( Config::CRON_LICENSE_CHECK ) ) {
+			wp_schedule_event( time(), 'twicedaily', Config::CRON_LICENSE_CHECK );
 		}
 	}
 
@@ -56,13 +54,13 @@ class LicenseClient {
 		$response = $this->request( 'POST', '/activate', [
 			'license_key'    => $license_key,
 			'site_url'       => home_url(),
-			'plugin_version' => YOUR_PLUGIN_VERSION,
+			'plugin_version' => Config::VERSION,
 		] );
 
 		if ( $response['success'] ) {
-			update_option( self::OPTION_KEY, $license_key );
-			update_option( self::STATUS_OPTION, 'active' );
-			update_option( self::DATA_OPTION, $response['data'] ?? [] );
+			update_option( Config::OPTION_LICENSE_KEY, $license_key );
+			update_option( Config::OPTION_LICENSE_STATUS, 'active' );
+			update_option( Config::OPTION_LICENSE_DATA, $response['data'] ?? [] );
 			$this->refresh_cache( $license_key );
 		}
 
@@ -82,9 +80,9 @@ class LicenseClient {
 		] );
 
 		if ( $response['success'] ) {
-			update_option( self::STATUS_OPTION, 'inactive' );
-			update_option( self::DATA_OPTION, [] );
-			delete_transient( self::CACHE_TRANSIENT );
+			update_option( Config::OPTION_LICENSE_STATUS, 'inactive' );
+			update_option( Config::OPTION_LICENSE_DATA, [] );
+			delete_transient( Config::TRANSIENT_LICENSE_CACHE );
 		}
 
 		return $response;
@@ -103,11 +101,11 @@ class LicenseClient {
 		] );
 
 		if ( $response['success'] ) {
-			update_option( self::STATUS_OPTION, 'active' );
-			update_option( self::DATA_OPTION, $response['data'] ?? [] );
+			update_option( Config::OPTION_LICENSE_STATUS, 'active' );
+			update_option( Config::OPTION_LICENSE_DATA, $response['data'] ?? [] );
 		} else {
-			update_option( self::STATUS_OPTION, 'invalid' );
-			update_option( self::DATA_OPTION, [] );
+			update_option( Config::OPTION_LICENSE_STATUS, 'invalid' );
+			update_option( Config::OPTION_LICENSE_DATA, [] );
 		}
 
 		return $response;
@@ -127,7 +125,7 @@ class LicenseClient {
 		}
 
 		if ( ! $force_refresh ) {
-			$cached = get_transient( self::CACHE_TRANSIENT );
+			$cached = get_transient( Config::TRANSIENT_LICENSE_CACHE );
 			if ( false !== $cached ) {
 				return $cached;
 			}
@@ -140,7 +138,7 @@ class LicenseClient {
 	 * Get the stored license key.
 	 */
 	public function get_key(): string {
-		return (string) get_option( self::OPTION_KEY, '' );
+		return (string) get_option( Config::OPTION_LICENSE_KEY, '' );
 	}
 
 	/**
@@ -149,14 +147,14 @@ class LicenseClient {
 	 * @return string One of: 'active', 'inactive', 'expired', 'invalid', or ''.
 	 */
 	public function get_status(): string {
-		return (string) get_option( self::STATUS_OPTION, '' );
+		return (string) get_option( Config::OPTION_LICENSE_STATUS, '' );
 	}
 
 	/**
 	 * Get stored license data (tier, features, expiry, etc.).
 	 */
 	public function get_data(): array {
-		return (array) get_option( self::DATA_OPTION, [] );
+		return (array) get_option( Config::OPTION_LICENSE_DATA, [] );
 	}
 
 	/**
@@ -191,8 +189,8 @@ class LicenseClient {
 		$data = $response['data'] ?? [];
 
 		if ( $response['success'] && ! empty( $data ) ) {
-			set_transient( self::CACHE_TRANSIENT, $data, self::CACHE_TTL );
-			update_option( self::DATA_OPTION, $data );
+			set_transient( Config::TRANSIENT_LICENSE_CACHE, $data, self::CACHE_TTL );
+			update_option( Config::OPTION_LICENSE_DATA, $data );
 		}
 
 		return $data;
@@ -216,7 +214,7 @@ class LicenseClient {
 		 * @param string $endpoint API endpoint.
 		 * @param string $method   HTTP method.
 		 */
-		$params = apply_filters( 'your_plugin_license_request_params', $params, $endpoint, $method );
+		$params = apply_filters( Config::PREFIX . 'license_request_params', $params, $endpoint, $method );
 
 		$args = [
 			'timeout'   => 15,
@@ -248,7 +246,7 @@ class LicenseClient {
 		if ( ! is_array( $body ) ) {
 			return [
 				'success' => false,
-				'message' => __( 'Invalid response from license server.', 'your-plugin' ),
+				'message' => __( 'Invalid response from license server.', Config::TEXT_DOMAIN ),
 			];
 		}
 

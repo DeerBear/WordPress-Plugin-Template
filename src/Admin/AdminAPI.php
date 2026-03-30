@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace YourPlugin\Admin;
 
+use YourPlugin\Config;
+
 /**
  * Provides reusable form field rendering and metabox registration.
  */
@@ -224,7 +226,7 @@ class AdminAPI {
 			$id,
 			$title,
 			function ( \WP_Post $post ) use ( $id, $fields ): void {
-				wp_nonce_field( "your_plugin_mb_{$id}", "your_plugin_mb_{$id}_nonce" );
+				wp_nonce_field( Config::meta_box_action( $id ), Config::meta_box_nonce( $id ) );
 
 				foreach ( $fields as $field ) {
 					$value = get_post_meta( $post->ID, $field['id'], true );
@@ -262,13 +264,13 @@ class AdminAPI {
 		 *
 		 * @param array $fields Array of field definitions with 'id' and 'type' keys.
 		 */
-		$fields = apply_filters( 'your_plugin_meta_box_fields', [] );
+		$fields = apply_filters( Config::PREFIX . 'meta_box_fields', [] );
 
 		foreach ( $fields as $field ) {
 			$meta_box_id = $field['meta_box_id'] ?? '';
-			$nonce_key   = "your_plugin_mb_{$meta_box_id}_nonce";
+			$nonce_key   = Config::meta_box_nonce( $meta_box_id );
 
-			if ( ! isset( $_POST[ $nonce_key ] ) || ! wp_verify_nonce( $_POST[ $nonce_key ], "your_plugin_mb_{$meta_box_id}" ) ) {
+			if ( ! isset( $_POST[ $nonce_key ] ) || ! wp_verify_nonce( $_POST[ $nonce_key ], Config::meta_box_action( $meta_box_id ) ) ) {
 				continue;
 			}
 
