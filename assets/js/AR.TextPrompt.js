@@ -386,44 +386,44 @@
         var files = Array.from(fileList);
 
         for (var i = 0; i < files.length; i++) {
-            var file = files[i];
+            (function(file) {
+                // Check if adding this file would exceed limit
+                if (self.totalFileSize + file.size > self.options.maxFileSize) {
+                    alert('Adding this file would exceed the ' + formatBytes(self.options.maxFileSize) + ' limit.');
+                    return;
+                }
 
-            // Check if adding this file would exceed limit
-            if (this.totalFileSize + file.size > this.options.maxFileSize) {
-                alert('Adding this file would exceed the ' + formatBytes(this.options.maxFileSize) + ' limit.');
-                continue;
-            }
+                self.totalFileSize += file.size;
 
-            this.totalFileSize += file.size;
+                var fileData = {
+                    id: generateId('file'),
+                    stepNumber: stepNumber,
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    checksum: null,
+                    checksumStatus: 'pending'
+                };
 
-            var fileData = {
-                id: generateId('file'),
-                stepNumber: stepNumber,
-                file: file,
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                checksum: null,
-                checksumStatus: 'pending'
-            };
+                self.files.push(fileData);
 
-            this.files.push(fileData);
-
-            // Calculate checksum if enabled
-            if (this.options.calculateChecksum) {
-                fileData.checksumStatus = 'calculating';
-                this.updateFilesGrid();
-
-                calculateChecksum(file).then(function(hash) {
-                    fileData.checksum = hash;
-                    fileData.checksumStatus = 'complete';
+                // Calculate checksum if enabled
+                if (self.options.calculateChecksum) {
+                    fileData.checksumStatus = 'calculating';
                     self.updateFilesGrid();
-                }).catch(function(error) {
-                    console.error('Checksum calculation failed:', error);
-                    fileData.checksumStatus = 'error';
-                    self.updateFilesGrid();
-                });
-            }
+
+                    calculateChecksum(file).then(function(hash) {
+                        fileData.checksum = hash;
+                        fileData.checksumStatus = 'complete';
+                        self.updateFilesGrid();
+                    }).catch(function(error) {
+                        console.error('Checksum calculation failed:', error);
+                        fileData.checksumStatus = 'error';
+                        self.updateFilesGrid();
+                    });
+                }
+            })(files[i]);
         }
 
         // Update progress bar
