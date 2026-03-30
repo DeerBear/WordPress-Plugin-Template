@@ -333,13 +333,19 @@
      */
     AR.DataGrid.Manager.prototype.getRange = function(startIndex, count, callback) {
         var endIndex = Math.min(startIndex + count, this.getTotalRows());
+        var expected = endIndex - startIndex;
         var rows = [];
         var loaded = 0;
         var self = this;
 
+        if (expected === 0) {
+            callback(rows);
+            return;
+        }
+
         function checkComplete() {
             loaded++;
-            if (loaded === count) {
+            if (loaded === expected) {
                 callback(rows);
             }
         }
@@ -689,15 +695,12 @@
             if (!rowData) return;
 
             // Get row from pool or create new
-            var tr = self.rowPool.length > 0
-                ? self.rowPool.pop()
-                : self.grid.createDataRow(rowData, rowIndex);
-
-            // Update row data if reused
-            if (self.rowPool.length === 0) {
-                tr = self.grid.createDataRow(rowData, rowIndex);
-            } else {
+            var tr;
+            if (self.rowPool.length > 0) {
+                tr = self.rowPool.pop();
                 self.updateRowData(tr, rowData, rowIndex);
+            } else {
+                tr = self.grid.createDataRow(rowData, rowIndex);
             }
 
             // Insert in correct position (before bottom spacer)
