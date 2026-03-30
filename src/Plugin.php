@@ -214,42 +214,115 @@ final class Plugin {
 	 * Enqueue frontend assets.
 	 */
 	public function enqueue_frontend_assets(): void {
+		$this->enqueue_ar_styles();
+		$this->enqueue_ar_scripts();
+
 		wp_enqueue_style(
 			Config::SLUG . '-frontend',
 			YOUR_PLUGIN_URL . 'assets/css/frontend.css',
-			[],
+			[ Config::SLUG . '-ar-utilities' ],
 			Config::VERSION
 		);
-
-		// Enqueue your own JS library here:
-		// wp_enqueue_script(
-		//     Config::SLUG . '-frontend',
-		//     YOUR_PLUGIN_URL . 'assets/js/your-library.js',
-		//     [],
-		//     Config::VERSION,
-		//     true
-		// );
 	}
 
 	/**
 	 * Enqueue admin assets.
 	 */
 	public function enqueue_admin_assets(): void {
+		$this->enqueue_ar_styles();
+		$this->enqueue_ar_scripts();
+
 		wp_enqueue_style(
 			Config::SLUG . '-admin',
 			YOUR_PLUGIN_URL . 'assets/css/admin.css',
-			[],
+			[ Config::SLUG . '-ar-utilities' ],
 			Config::VERSION
 		);
+	}
 
-		// Enqueue your own JS library for admin here:
-		// wp_enqueue_script(
-		//     Config::SLUG . '-admin',
-		//     YOUR_PLUGIN_URL . 'assets/js/your-library.js',
-		//     [],
-		//     Config::VERSION,
-		//     true
-		// );
+	/**
+	 * Enqueue AR CSS library.
+	 */
+	private function enqueue_ar_styles(): void {
+		$slug = Config::SLUG;
+		$url  = YOUR_PLUGIN_URL . 'assets/css/';
+		$ver  = Config::VERSION;
+
+		wp_enqueue_style( $slug . '-ar-utilities',   $url . 'AR.Utilities.css',   [], $ver );
+		wp_enqueue_style( $slug . '-ar-icons',        $url . 'AR.Icons.css',        [], $ver );
+		wp_enqueue_style( $slug . '-ar-components',   $url . 'AR.Components.css',   [ $slug . '-ar-utilities' ], $ver );
+		wp_enqueue_style( $slug . '-ar-datagrid',     $url . 'AR.DataGrid.css',     [ $slug . '-ar-utilities' ], $ver );
+		wp_enqueue_style( $slug . '-ar-datepicker',   $url . 'AR.DatePicker.css',   [ $slug . '-ar-utilities' ], $ver );
+		wp_enqueue_style( $slug . '-ar-charts',       $url . 'AR.Charts.css',       [ $slug . '-ar-utilities' ], $ver );
+		wp_enqueue_style( $slug . '-ar-textprompt',   $url . 'AR.TextPrompt.css',   [ $slug . '-ar-utilities', $slug . '-ar-icons' ], $ver );
+		wp_enqueue_style( $slug . '-ar-weganalytics', $url . 'WegAnalytics.css',    [], $ver );
+	}
+
+	/**
+	 * Enqueue AR JavaScript library.
+	 *
+	 * Load order respects dependencies:
+	 *   1. MVVM (foundation — no deps)
+	 *   2. Components, DatePicker (depend on MVVM optionally)
+	 *   3. DataGrid, Charts (depend on MVVM)
+	 *   4. DataGrid.Manager (depends on DataGrid + MVVM)
+	 *   5. Charts.Extension (depends on Charts)
+	 *   6. TextPrompt, TenantManager (depend on Components + MVVM)
+	 *   7. DataGrid v2 variants (standalone, depend on nothing)
+	 *   8. Loader modules (ES modules, loaded separately)
+	 */
+	private function enqueue_ar_scripts(): void {
+		$slug = Config::SLUG;
+		$url  = YOUR_PLUGIN_URL . 'assets/js/';
+		$ver  = Config::VERSION;
+
+		// Foundation: MVVM frameworks
+		wp_enqueue_script( $slug . '-ar-mvvm',     $url . 'AR.MVVM.js',     [], $ver, true );
+		wp_enqueue_script( $slug . '-ar-mvvm-v2',  $url . 'AR.MVVM_v2.js',  [], $ver, true );
+
+		// Core UI components (optional MVVM dependency)
+		$mvvm = [ $slug . '-ar-mvvm' ];
+		wp_enqueue_script( $slug . '-ar-components', $url . 'AR.Components.js', [],    $ver, true );
+		wp_enqueue_script( $slug . '-ar-datepicker', $url . 'AR.DatePicker.js', [],    $ver, true );
+
+		// DataGrid (requires MVVM)
+		wp_enqueue_script( $slug . '-ar-datagrid',         $url . 'AR.DataGrid.js',         $mvvm, $ver, true );
+		wp_enqueue_script( $slug . '-ar-datagrid-manager', $url . 'AR.DataGrid.Manager.js', [ $slug . '-ar-datagrid' ], $ver, true );
+		wp_enqueue_script( $slug . '-ar-datagrid-v2',      $url . 'AR.DataGrid_v2.js',      [], $ver, true );
+		wp_enqueue_script( $slug . '-ar-datagrid-v2-draft', $url . 'AR.DataGridv2_Draft.js', [], $ver, true );
+
+		// Charts (optional MVVM)
+		wp_enqueue_script( $slug . '-ar-charts',     $url . 'AR.Charts.js',           $mvvm, $ver, true );
+		wp_enqueue_script( $slug . '-ar-charts-ext', $url . 'AR.Charts.Extension.js', [ $slug . '-ar-charts' ], $ver, true );
+
+		// TextPrompt (uses Components for ProgressBar)
+		wp_enqueue_script( $slug . '-ar-textprompt', $url . 'AR.TextPrompt.js', [ $slug . '-ar-components' ], $ver, true );
+
+		// TenantManager (uses MVVM, Components, DataGrid)
+		wp_enqueue_script(
+			$slug . '-ar-tenantmanager',
+			$url . 'AR.TenantManager.js',
+			[ $slug . '-ar-mvvm', $slug . '-ar-components', $slug . '-ar-datagrid' ],
+			$ver,
+			true
+		);
+
+		// ES module loaders — add type="module" attribute via filter
+		wp_enqueue_script( $slug . '-ar-loader-node',      $url . 'LoaderNode.js',      [], $ver, true );
+		wp_enqueue_script( $slug . '-ar-loader-tree',      $url . 'LoaderTree.js',      [ $slug . '-ar-loader-node' ], $ver, true );
+		wp_enqueue_script( $slug . '-ar-uikit-loader-node', $url . 'UIKitLoaderNode.js', [ $slug . '-ar-loader-node' ], $ver, true );
+
+		add_filter( 'script_loader_tag', function ( $tag, $handle ) use ( $slug ) {
+			$module_handles = [
+				$slug . '-ar-loader-node',
+				$slug . '-ar-loader-tree',
+				$slug . '-ar-uikit-loader-node',
+			];
+			if ( in_array( $handle, $module_handles, true ) ) {
+				$tag = str_replace( '<script ', '<script type="module" ', $tag );
+			}
+			return $tag;
+		}, 10, 2 );
 	}
 
 	// -- Activation / Deactivation -------------------------------------------
