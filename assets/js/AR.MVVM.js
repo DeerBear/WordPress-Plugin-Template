@@ -5,7 +5,36 @@
  */
 (function(window) {
     'use strict';
-    
+
+    /**
+     * Sanitize HTML string to prevent XSS.
+     * Strips script tags, event handler attributes, and javascript: URLs.
+     */
+    function sanitizeHTML(html) {
+        if (typeof html !== 'string') return '';
+        var temp = document.createElement('div');
+        temp.innerHTML = html;
+        // Remove script elements
+        var scripts = temp.querySelectorAll('script');
+        for (var i = scripts.length - 1; i >= 0; i--) {
+            scripts[i].parentNode.removeChild(scripts[i]);
+        }
+        // Remove event handler attributes and javascript: URLs from all elements
+        var allElements = temp.querySelectorAll('*');
+        for (var j = 0; j < allElements.length; j++) {
+            var el = allElements[j];
+            var attrs = el.attributes;
+            for (var k = attrs.length - 1; k >= 0; k--) {
+                var attrName = attrs[k].name.toLowerCase();
+                var attrValue = attrs[k].value.toLowerCase().trim();
+                if (attrName.startsWith('on') || attrValue.startsWith('javascript:')) {
+                    el.removeAttribute(attrs[k].name);
+                }
+            }
+        }
+        return temp.innerHTML;
+    }
+
     function Observable(initialValue) {
         var value = initialValue;
         var subscribers = [];
@@ -202,14 +231,14 @@
             }
         });
         
-        // Handle html bindings
+        // Handle html bindings (sanitized to prevent XSS)
         rootElement.querySelectorAll('[data-bind*="html:"]').forEach(function(element) {
             var binding = parseBinding(element.getAttribute('data-bind'));
             var prop = binding.html;
-            
+
             if (viewModel[prop]) {
                 viewModel[prop].subscribe(function(newValue) {
-                    element.innerHTML = newValue || '';
+                    element.innerHTML = sanitizeHTML(newValue || '');
                 });
             }
         });
@@ -295,7 +324,7 @@
                             }
                             
                             if (childBinding.html && item[childBinding.html] !== undefined) {
-                                child.innerHTML = item[childBinding.html];
+                                child.innerHTML = sanitizeHTML(item[childBinding.html]);
                             }
                             
                             if (childBinding.click) {

@@ -7,11 +7,38 @@
     'use strict';
     
     var AR = window.AR || {};
-    
+
     // ============================================================================
     // UTILITIES
     // ============================================================================
-    
+
+    /**
+     * Sanitize HTML string to prevent XSS.
+     * Strips script tags, event handler attributes, and javascript: URLs.
+     */
+    function sanitizeHTML(html) {
+        if (typeof html !== 'string') return '';
+        var temp = document.createElement('div');
+        temp.innerHTML = html;
+        var scripts = temp.querySelectorAll('script');
+        for (var i = scripts.length - 1; i >= 0; i--) {
+            scripts[i].parentNode.removeChild(scripts[i]);
+        }
+        var allElements = temp.querySelectorAll('*');
+        for (var j = 0; j < allElements.length; j++) {
+            var el = allElements[j];
+            var attrs = el.attributes;
+            for (var k = attrs.length - 1; k >= 0; k--) {
+                var attrName = attrs[k].name.toLowerCase();
+                var attrValue = attrs[k].value.toLowerCase().trim();
+                if (attrName.startsWith('on') || attrValue.startsWith('javascript:')) {
+                    el.removeAttribute(attrs[k].name);
+                }
+            }
+        }
+        return temp.innerHTML;
+    }
+
     function addClass(element, className) {
         if (element.classList) {
             element.classList.add(className);
@@ -419,11 +446,11 @@
         addClass(this.body, 'modal-body');
         
         if (typeof this.options.content === 'string') {
-            this.body.innerHTML = this.options.content;
+            this.body.innerHTML = sanitizeHTML(this.options.content);
         } else if (this.options.content instanceof HTMLElement) {
             this.body.appendChild(this.options.content);
         }
-        
+
         this.dialog.appendChild(this.body);
         this.container.appendChild(this.dialog);
         
@@ -1179,7 +1206,7 @@
         addClass(this.body, 'floater-body');
 
         if (typeof this.options.content === 'string') {
-            this.body.innerHTML = this.options.content;
+            this.body.innerHTML = sanitizeHTML(this.options.content);
         } else if (this.options.content instanceof HTMLElement) {
             this.body.appendChild(this.options.content);
             this.options.content.style.removeProperty('display');

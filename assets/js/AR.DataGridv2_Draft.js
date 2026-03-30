@@ -27,6 +27,11 @@
         if (typeof selector === 'string') return document.querySelector(selector);
         return selector;
     }
+    function escapeHTML(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
     function parseNumericValue(val) {
         if (typeof val === 'number') return val;
         if (typeof val !== 'string') return null;
@@ -298,7 +303,7 @@
         this.groups.forEach(function(g){
             var tr=document.createElement('tr');tr.className='datagrid-group-row';
             var icon=self.collapsedGroups[g.key]?'&#43;':'&#8722;';
-            tr.innerHTML='<td colspan="100%"><span class="group-toggle">'+icon+'</span> '+g.key+' ('+g.pointers.length+')</td>';
+            tr.innerHTML='<td colspan="100%"><span class="group-toggle">'+icon+'</span> '+escapeHTML(g.key)+' ('+g.pointers.length+')</td>';
             tr.onclick=function(){self.collapsedGroups[g.key]=!self.collapsedGroups[g.key];self.render();};
             self.tbody.appendChild(tr);
             if(!self.collapsedGroups[g.key])g.pointers.forEach(function(p){self.tbody.appendChild(self.createDataRow(p,dIdx++));});

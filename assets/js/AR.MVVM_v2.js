@@ -120,10 +120,33 @@ class Compiler {
       (newList || []).forEach(rowData => {
         const clone = template.cloneNode(true);
         clone.removeAttribute('v-for');
-        clone.innerHTML = clone.innerHTML.replace(/\{\{(.+?)\}\}/g, (_, key) => {
-           const path = key.trim().split('.');
-           if(path[0] === item) return path.slice(1).reduce((obj, k) => obj ? obj[k] : '', rowData);
-           return _;
+        // Use DOM-safe text replacement to prevent XSS
+        clone.querySelectorAll('*').forEach(el => {
+          [...el.childNodes].forEach(child => {
+            if (child.nodeType === 3) {
+              const raw = child.textContent;
+              if (/\{\{.+?\}\}/.test(raw)) {
+                child.textContent = raw.replace(/\{\{(.+?)\}\}/g, (_, key) => {
+                  const path = key.trim().split('.');
+                  if (path[0] === item) return path.slice(1).reduce((obj, k) => obj ? obj[k] : '', rowData);
+                  return _;
+                });
+              }
+            }
+          });
+        });
+        // Also handle direct text nodes of the clone itself
+        [...clone.childNodes].forEach(child => {
+          if (child.nodeType === 3) {
+            const raw = child.textContent;
+            if (/\{\{.+?\}\}/.test(raw)) {
+              child.textContent = raw.replace(/\{\{(.+?)\}\}/g, (_, key) => {
+                const path = key.trim().split('.');
+                if (path[0] === item) return path.slice(1).reduce((obj, k) => obj ? obj[k] : '', rowData);
+                return _;
+              });
+            }
+          }
         });
         fragment.appendChild(clone);
       });
