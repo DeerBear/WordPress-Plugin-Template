@@ -19,7 +19,8 @@
 }
 
 .ar-accordion *,
-.ar-modal *
+.ar-modal *,
+.ar-modal * .ar-drawer *,
 .ar-drawer *,
 .ar-alert *,
 .ar-notification *,
