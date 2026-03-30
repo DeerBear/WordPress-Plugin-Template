@@ -15,6 +15,7 @@ use YourPlugin\License\LicenseClient;
 use YourPlugin\License\FeatureGate;
 use YourPlugin\License\LicenseAdmin;
 use YourPlugin\Update\UpdateChecker;
+use YourPlugin\WooCommerce\WooCommerceBootstrap;
 
 /**
  * Plugin singleton class.
@@ -28,6 +29,7 @@ final class Plugin {
 	private ?LicenseClient $license_client = null;
 	private ?FeatureGate $feature_gate = null;
 	private ?UpdateChecker $update_checker = null;
+	private ?WooCommerceBootstrap $woocommerce = null;
 
 	/**
 	 * Returns the singleton instance.
@@ -47,6 +49,7 @@ final class Plugin {
 		$this->init_license();
 		$this->init_admin();
 		$this->init_update_checker();
+		$this->init_woocommerce();
 		$this->register_hooks();
 	}
 
@@ -110,6 +113,13 @@ final class Plugin {
 			apply_filters( Config::PREFIX . 'update_url', Config::UPDATE_URL ),
 			$this->license_client
 		);
+	}
+
+	/**
+	 * Initialise WooCommerce integration (loads only if WC is active).
+	 */
+	private function init_woocommerce(): void {
+		$this->woocommerce = new WooCommerceBootstrap();
 	}
 
 	/**
@@ -216,5 +226,9 @@ final class Plugin {
 
 	public function features(): FeatureGate {
 		return $this->feature_gate;
+	}
+
+	public function woocommerce(): ?WooCommerceBootstrap {
+		return $this->woocommerce;
 	}
 }
