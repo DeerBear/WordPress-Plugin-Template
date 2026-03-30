@@ -298,8 +298,8 @@
     AR.Chart.prototype.setupResponsive = function () {
         var self = this;
         var resizeTimeout;
-        
-        window.addEventListener('resize', function () {
+
+        this._resizeHandler = function () {
             if (resizeTimeout) {
                 clearTimeout(resizeTimeout);
             }
@@ -307,7 +307,8 @@
                 self.setupCanvas();
                 self.render();
             }, 250);
-        });
+        };
+        window.addEventListener('resize', this._resizeHandler);
     };
     
     // =========================================================================

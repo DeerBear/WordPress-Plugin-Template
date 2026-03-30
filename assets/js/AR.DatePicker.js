@@ -219,12 +219,13 @@
         });
         
         // Close on outside click
-        document.addEventListener('click', function(e) {
+        this._outsideClickHandler = function(e) {
             if (self.isOpen && !self.wrapper.contains(e.target)) {
                 self.close();
             }
-        });
-        
+        };
+        document.addEventListener('click', this._outsideClickHandler);
+
         // Keyboard navigation
         this.popup.addEventListener('keydown', function(e) {
             self.handleKeydown(e);
@@ -527,7 +528,15 @@
             this.open();
         }
     };
-    
+
+    AR.DatePicker.prototype.destroy = function() {
+        if (this._outsideClickHandler) {
+            document.removeEventListener('click', this._outsideClickHandler);
+            this._outsideClickHandler = null;
+        }
+        this.close();
+    };
+
     // ============================================================================
     // RANGE PICKER
     // ============================================================================
@@ -620,11 +629,12 @@
         });
         
         // Close on outside click
-        document.addEventListener('click', function(e) {
+        this._outsideClickHandler = function(e) {
             if (self.isOpen && !self.container.contains(e.target)) {
                 self.close();
             }
-        });
+        };
+        document.addEventListener('click', this._outsideClickHandler);
     };
     
     AR.RangePicker.prototype.buildRangePicker = function() {
@@ -1066,7 +1076,15 @@
             end: this.endDate
         };
     };
-    
+
+    AR.RangePicker.prototype.destroy = function() {
+        if (this._outsideClickHandler) {
+            document.removeEventListener('click', this._outsideClickHandler);
+            this._outsideClickHandler = null;
+        }
+        this.close();
+    };
+
     // ============================================================================
     // EXPORT
     // ============================================================================

@@ -87,12 +87,11 @@
                             formElement.style.display = 'block';
                         }
 
-                        // Re-apply MVVM bindings to modal content
-                        if (window.MVVM && modal.body) {
+                        // Apply MVVM bindings only once to avoid stacking listeners
+                        if (window.MVVM && modal.body && !modal._mvvmBound) {
                             MVVM.applyBindings(self, modal.body);
+                            modal._mvvmBound = true;
                         }
-
-                        console.log('Modal shown, form element:', formElement);
                     }
                 });
             } else {
