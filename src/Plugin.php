@@ -14,6 +14,7 @@ namespace YourPlugin;
 
 use YourPlugin\Admin\Settings;
 use YourPlugin\Admin\AdminAPI;
+use YourPlugin\Admin\Dashboard;
 use YourPlugin\License\LicenseClient;
 use YourPlugin\License\FeatureGate;
 use YourPlugin\License\LicenseAdmin;
@@ -33,6 +34,7 @@ final class Plugin {
 	private ?FeatureGate $feature_gate = null;
 	private ?UpdateChecker $update_checker = null;
 	private ?WooCommerceBootstrap $woocommerce = null;
+	private ?Dashboard $dashboard = null;
 
 	/**
 	 * Returns the singleton instance.
@@ -50,6 +52,7 @@ final class Plugin {
 	private function __construct() {
 		$this->load_textdomain();
 		$this->init_license();
+		$this->init_dashboard();
 		$this->init_wp_features();
 		$this->init_woocommerce();
 		$this->init_update_checker();
@@ -89,6 +92,24 @@ final class Plugin {
 		if ( is_admin() ) {
 			new LicenseAdmin( $this->license_client );
 		}
+	}
+
+	/**
+	 * Initialise the licensed dashboard.
+	 *
+	 * Registers the dashboard admin page only when the license is valid.
+	 * Panels are added externally via the {@see Config::PREFIX}dashboard_panels filter.
+	 */
+	private function init_dashboard(): void {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		if ( ! $this->feature_gate->is_valid() ) {
+			return;
+		}
+
+		$this->dashboard = new Dashboard( $this->feature_gate );
 	}
 
 	/**
@@ -227,15 +248,27 @@ final class Plugin {
 
 	/**
 	 * Enqueue admin assets.
+	 *
+	 * The AR library is loaded only on the dashboard page.
+	 * The admin stylesheet loads on all admin pages for notices, settings, etc.
+	 *
+	 * @param string $hook_suffix The current admin page hook suffix.
 	 */
-	public function enqueue_admin_assets(): void {
-		$this->enqueue_ar_styles();
-		$this->enqueue_ar_scripts();
+	public function enqueue_admin_assets( string $hook_suffix = '' ): void {
+		$dashboard_hook = $this->dashboard ? $this->dashboard->get_hook() : '';
+
+		// AR library only on the dashboard page.
+		if ( $dashboard_hook && $hook_suffix === $dashboard_hook ) {
+			$this->enqueue_ar_styles();
+			$this->enqueue_ar_scripts();
+		}
 
 		wp_enqueue_style(
 			Config::SLUG . '-admin',
 			YOUR_PLUGIN_URL . 'assets/css/admin.css',
-			[ Config::SLUG . '-ar-utilities' ],
+			$dashboard_hook && $hook_suffix === $dashboard_hook
+				? [ Config::SLUG . '-ar-utilities' ]
+				: [],
 			Config::VERSION
 		);
 	}
@@ -384,5 +417,9 @@ final class Plugin {
 
 	public function woocommerce(): ?WooCommerceBootstrap {
 		return $this->woocommerce;
+	}
+
+	public function dashboard(): ?Dashboard {
+		return $this->dashboard;
 	}
 }
